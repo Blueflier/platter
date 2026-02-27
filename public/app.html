@@ -10,8 +10,8 @@
 
     body {
       font-family: 'Inter', system-ui, -apple-system, sans-serif;
-      background: #09090b;
-      color: #fafafa;
+      background: #e8f0fe;
+      color: #1e293b;
       min-height: 100vh;
     }
 
@@ -32,22 +32,8 @@
       font-size: 1.35rem;
       font-weight: 700;
       letter-spacing: -0.02em;
-      color: #fafafa;
+      color: #1e293b;
       text-decoration: none;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .logo-icon {
-      width: 28px;
-      height: 28px;
-      background: linear-gradient(135deg, #818cf8, #c084fc);
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.85rem;
     }
 
     /* ---- search ---- */
@@ -70,7 +56,7 @@
       transform: translateY(-50%);
       width: 18px;
       height: 18px;
-      color: #52525b;
+      color: #94a3b8;
       pointer-events: none;
     }
 
@@ -79,18 +65,18 @@
       padding: 0.95rem 1rem 0.95rem 3rem;
       font-size: 1.05rem;
       font-family: inherit;
-      color: #fafafa;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 14px;
+      color: #1e293b;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 16px;
       outline: none;
       transition: border-color 0.15s, box-shadow 0.15s;
     }
 
-    #searchInput::placeholder { color: #52525b; }
+    #searchInput::placeholder { color: #94a3b8; }
     #searchInput:focus {
-      border-color: rgba(129,140,248,0.5);
-      box-shadow: 0 0 0 3px rgba(129,140,248,0.1);
+      border-color: #93b5f7;
+      box-shadow: 0 0 0 3px rgba(147,181,247,0.25);
     }
 
     /* typing placeholder */
@@ -100,7 +86,7 @@
       top: 50%;
       transform: translateY(-50%);
       font-size: 1.05rem;
-      color: #52525b;
+      color: #94a3b8;
       pointer-events: none;
       white-space: nowrap;
       overflow: hidden;
@@ -110,7 +96,7 @@
       display: inline-block;
       width: 1px;
       height: 1.1em;
-      background: #52525b;
+      background: #94a3b8;
       vertical-align: text-bottom;
       margin-left: 1px;
       animation: blink 1s step-end infinite;
@@ -128,10 +114,10 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 12px;
-      color: #71717a;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 14px;
+      color: #64748b;
       cursor: pointer;
       font-size: 1.05rem;
       font-weight: 600;
@@ -141,9 +127,9 @@
     }
 
     .info-btn:hover {
-      border-color: rgba(129,140,248,0.4);
-      color: #a1a1aa;
-      background: rgba(255,255,255,0.06);
+      border-color: #93b5f7;
+      color: #475569;
+      background: #f0f5ff;
     }
 
     /* ---- info modal ---- */
@@ -151,7 +137,7 @@
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.6);
+      background: rgba(30,41,59,0.3);
       backdrop-filter: blur(4px);
       z-index: 100;
       align-items: center;
@@ -161,14 +147,15 @@
     .modal-overlay.open { display: flex; }
 
     .modal {
-      background: #18181b;
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 16px;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 20px;
       padding: 2rem;
       max-width: 520px;
       width: 90%;
       position: relative;
       animation: modalIn 0.2s ease-out;
+      box-shadow: 0 20px 60px rgba(30,41,59,0.12);
     }
 
     @keyframes modalIn {
@@ -185,37 +172,38 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 8px;
-      color: #71717a;
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      color: #64748b;
       cursor: pointer;
       font-size: 1.1rem;
       transition: background 0.15s;
     }
 
-    .modal-close:hover { background: rgba(255,255,255,0.1); }
+    .modal-close:hover { background: #e2e8f0; }
 
     .modal h2 {
       font-size: 1.15rem;
       font-weight: 600;
       margin-bottom: 1rem;
+      color: #1e293b;
     }
 
     .modal ol {
       padding-left: 1.3rem;
-      color: #a1a1aa;
+      color: #64748b;
       font-size: 0.9rem;
       line-height: 1.8;
     }
 
     .modal ol li { margin-bottom: 0.4rem; }
-    .modal ol li strong { color: #fafafa; font-weight: 500; }
+    .modal ol li strong { color: #1e293b; font-weight: 500; }
 
     .modal p.hint {
       margin-top: 1rem;
       font-size: 0.82rem;
-      color: #52525b;
+      color: #94a3b8;
       font-style: italic;
     }
 
@@ -233,7 +221,7 @@
 
     .results-header .status {
       font-size: 0.85rem;
-      color: #71717a;
+      color: #64748b;
       min-height: 1.3em;
     }
 
@@ -241,8 +229,8 @@
       display: inline-block;
       width: 12px;
       height: 12px;
-      border: 2px solid rgba(255,255,255,0.1);
-      border-top-color: #818cf8;
+      border: 2px solid #e2e8f0;
+      border-top-color: #6b9cf7;
       border-radius: 50%;
       animation: spin 0.6s linear infinite;
       vertical-align: middle;
@@ -258,16 +246,16 @@
       padding: 0.45rem 1rem;
       font-size: 0.82rem;
       font-weight: 500;
-      color: #a1a1aa;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.08);
+      color: #64748b;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
       border-radius: 9999px;
       cursor: pointer;
       transition: background 0.15s;
     }
 
-    .saved-toggle:hover { background: rgba(255,255,255,0.08); }
-    .saved-toggle.active { color: #c084fc; border-color: rgba(192,132,252,0.3); }
+    .saved-toggle:hover { background: #f0f5ff; }
+    .saved-toggle.active { color: #7c6bc4; border-color: rgba(124,107,196,0.4); }
 
     .saved-toggle svg {
       width: 14px;
@@ -275,115 +263,98 @@
     }
 
     /* ---- cards ---- */
-    .cards { display: flex; flex-direction: column; gap: 1rem; }
+    .cards { display: flex; flex-direction: column; gap: 0.75rem; }
 
     .card {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.07);
-      border-radius: 14px;
-      padding: 1.5rem;
-      transition: border-color 0.2s;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 18px;
+      padding: 1.25rem 1.5rem;
+      transition: border-color 0.2s, box-shadow 0.2s;
     }
 
-    .card:hover { border-color: rgba(255,255,255,0.12); }
+    .card:hover {
+      border-color: #c7d7f5;
+      box-shadow: 0 4px 16px rgba(107,156,247,0.08);
+    }
 
     .card-top {
       display: flex;
       justify-content: space-between;
-      align-items: flex-start;
+      align-items: center;
       gap: 1rem;
-      margin-bottom: 0.75rem;
     }
 
     .card-name {
-      font-size: 1.1rem;
+      font-size: 1.05rem;
       font-weight: 600;
+      color: #1e293b;
     }
 
     .card-rating {
       flex-shrink: 0;
-      font-size: 0.82rem;
-      color: #a1a1aa;
+      font-size: 0.8rem;
+      color: #64748b;
       white-space: nowrap;
     }
 
-    .card-rating .star { color: #facc15; }
+    .card-rating .star { color: #f59e0b; }
 
     .card-meta {
-      font-size: 0.82rem;
-      color: #71717a;
-      line-height: 1.7;
+      font-size: 0.8rem;
+      color: #94a3b8;
+      margin-top: 0.3rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
     }
 
-    .card-meta a {
-      color: #818cf8;
-      text-decoration: none;
+    .card-meta .separator {
+      color: #cbd5e1;
     }
 
-    .card-meta a:hover { text-decoration: underline; }
-
-    .card-style {
-      display: inline-block;
-      margin-top: 0.6rem;
-      padding: 0.2rem 0.65rem;
-      font-size: 0.75rem;
-      font-weight: 500;
-      color: #c084fc;
-      background: rgba(192,132,252,0.1);
-      border-radius: 9999px;
-    }
-
-    .card-desc {
-      margin-top: 0.7rem;
-      font-size: 0.85rem;
-      color: #a1a1aa;
-      line-height: 1.55;
-      font-style: italic;
-    }
-
-    /* email draft area */
-    .draft-section {
-      margin-top: 1rem;
-      padding-top: 1rem;
-      border-top: 1px solid rgba(255,255,255,0.06);
-    }
-
-    .draft-label {
-      font-size: 0.75rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: #52525b;
-      margin-bottom: 0.5rem;
-    }
-
-    .draft-textarea {
-      width: 100%;
-      min-height: 120px;
-      padding: 0.75rem;
-      font-size: 0.82rem;
+    .copy-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.2rem 0.55rem;
+      font-size: 0.78rem;
       font-family: inherit;
-      line-height: 1.6;
-      color: #d4d4d8;
-      background: rgba(0,0,0,0.3);
-      border: 1px solid rgba(255,255,255,0.06);
+      color: #475569;
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
       border-radius: 8px;
-      resize: vertical;
-      outline: none;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+      white-space: nowrap;
     }
 
-    .draft-textarea:focus {
-      border-color: rgba(129,140,248,0.4);
+    .copy-chip:hover {
+      background: #e8eef6;
+      border-color: #c7d7f5;
+    }
+
+    .copy-chip.copied {
+      background: #d1fae5;
+      border-color: #a7f3d0;
+      color: #065f46;
+    }
+
+    .copy-chip svg {
+      width: 12px;
+      height: 12px;
+      flex-shrink: 0;
     }
 
     .call-instead {
-      margin-top: 0.75rem;
-      padding: 0.75rem;
-      font-size: 0.85rem;
-      background: rgba(250,204,21,0.06);
-      border: 1px solid rgba(250,204,21,0.12);
-      border-radius: 8px;
-      color: #facc15;
+      margin-top: 0.5rem;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.82rem;
+      background: #fef9e7;
+      border: 1px solid #fde68a;
+      border-radius: 12px;
+      color: #92400e;
     }
 
     /* card actions */
@@ -392,6 +363,7 @@
       display: flex;
       gap: 0.5rem;
       flex-wrap: wrap;
+      align-items: center;
     }
 
     .btn {
@@ -402,7 +374,7 @@
       font-size: 0.82rem;
       font-weight: 500;
       font-family: inherit;
-      border-radius: 8px;
+      border-radius: 12px;
       border: none;
       cursor: pointer;
       transition: background 0.15s, transform 0.1s;
@@ -411,23 +383,93 @@
     .btn:active { transform: scale(0.97); }
 
     .btn-primary {
-      background: #fafafa;
-      color: #09090b;
+      background: #6b9cf7;
+      color: #ffffff;
     }
 
-    .btn-primary:hover { background: #e4e4e7; }
+    .btn-primary:hover { background: #5a8be6; }
 
     .btn-ghost {
-      background: rgba(255,255,255,0.05);
-      color: #a1a1aa;
-      border: 1px solid rgba(255,255,255,0.08);
+      background: #f1f5f9;
+      color: #475569;
+      border: 1px solid #e2e8f0;
     }
 
-    .btn-ghost:hover { background: rgba(255,255,255,0.08); }
+    .btn-ghost:hover { background: #e8eef6; }
 
     .btn-copied {
-      background: rgba(74,222,128,0.15);
-      color: #4ade80;
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    /* ---- email hover popover ---- */
+    .email-popover-wrap {
+      position: relative;
+      display: inline-flex;
+    }
+
+    .email-popover {
+      display: none;
+      position: absolute;
+      bottom: calc(100% + 10px);
+      left: 50%;
+      transform: translateX(-50%);
+      width: 340px;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 1rem;
+      box-shadow: 0 12px 40px rgba(30,41,59,0.12);
+      z-index: 50;
+      animation: popIn 0.15s ease-out;
+    }
+
+    .email-popover::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 8px solid transparent;
+      border-top-color: #ffffff;
+    }
+
+    .email-popover::before {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 9px solid transparent;
+      border-top-color: #e2e8f0;
+    }
+
+    @keyframes popIn {
+      from { opacity: 0; transform: translateX(-50%) translateY(4px); }
+      to { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
+
+    .email-popover-wrap:hover .email-popover,
+    .email-popover-wrap.popover-active .email-popover {
+      display: block;
+    }
+
+    .email-popover-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #94a3b8;
+      margin-bottom: 0.5rem;
+    }
+
+    .email-popover-body {
+      font-size: 0.8rem;
+      line-height: 1.6;
+      color: #475569;
+      white-space: pre-wrap;
+      max-height: 200px;
+      overflow-y: auto;
     }
 
     /* building state */
@@ -440,8 +482,8 @@
       display: inline-block;
       width: 10px;
       height: 10px;
-      border: 2px solid rgba(255,255,255,0.1);
-      border-top-color: #818cf8;
+      border: 2px solid #e2e8f0;
+      border-top-color: #6b9cf7;
       border-radius: 50%;
       animation: spin 0.6s linear infinite;
       margin-left: 0.5rem;
@@ -452,21 +494,21 @@
     .saved-section {
       margin-top: 2rem;
       padding-top: 1.5rem;
-      border-top: 1px solid rgba(255,255,255,0.06);
+      border-top: 1px solid #e2e8f0;
     }
 
     .saved-section h3 {
       font-size: 0.85rem;
-      color: #52525b;
+      color: #94a3b8;
       font-weight: 500;
       margin-bottom: 1rem;
     }
 
     .card.saved {
-      opacity: 0.5;
+      opacity: 0.55;
     }
 
-    .card.saved:hover { opacity: 0.7; }
+    .card.saved:hover { opacity: 0.75; }
 
     /* fade in */
     @keyframes fadeIn {
@@ -479,14 +521,9 @@
 </head>
 <body>
   <div class="app">
-    <!-- header: logo top-left -->
+    <!-- header: just text, no icon -->
     <div class="header">
-      <a href="/" class="logo">
-        <div class="logo-icon">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>
-        </div>
-        Platter
-      </a>
+      <a href="/" class="logo">Platter</a>
     </div>
 
     <!-- search row with info button -->
@@ -770,20 +807,15 @@
       const hasEmail = biz.email && biz.email !== 'null';
       const liveUrl = biz.live_url || '';
 
-      let draftSection = '';
-      if (hasEmail && liveUrl) {
-        const draft = `Subject: We built you a free website\n\nHi ${biz.name},\n\nWe noticed you didn't have a website so we built one for you — take a look:\n${liveUrl}\n\nHappy to chat if you have questions.\n— Platter`;
-        draftSection = `
-          <div class="draft-section">
-            <div class="draft-label">Email draft</div>
-            <textarea class="draft-textarea" data-draft>${draft}</textarea>
-          </div>`;
-      } else if (!hasEmail && biz.phone) {
-        draftSection = `
-          <div class="draft-section">
-            <div class="call-instead">Call instead: ${biz.phone}</div>
-          </div>`;
-      }
+      // Build condensed address: just city-level
+      const addressShort = biz.address ? esc(biz.address) : '';
+
+      // Email draft text (hidden, used for popover)
+      const draft = hasEmail && liveUrl
+        ? `Subject: We built you a free website\n\nHi ${biz.name},\n\nWe noticed you didn't have a website so we built one for you — take a look:\n${liveUrl}\n\nHappy to chat if you have questions.\n— Platter`
+        : '';
+
+      const copyIcon = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 011.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 00-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 01-1.125-1.125v-9.25m0 0a9.06 9.06 0 011.5-.124H15a3.75 3.75 0 013.75 3.75v5.624"/></svg>`;
 
       card.innerHTML = `
         <div class="card-top">
@@ -791,39 +823,62 @@
           ${biz.google_rating ? `<div class="card-rating"><span class="star">&#9733;</span> ${biz.google_rating} (${biz.google_reviews})</div>` : ''}
         </div>
         <div class="card-meta">
-          ${biz.address ? `${esc(biz.address)}<br>` : ''}
-          ${biz.phone ? `${esc(biz.phone)}<br>` : ''}
-          ${hasEmail ? `${esc(biz.email)}<br>` : '<span style="color:#52525b">Email not found</span><br>'}
-          ${liveUrl ? `<a href="${esc(liveUrl)}" target="_blank">${esc(liveUrl)}</a>` : ''}
+          ${addressShort ? `<span>${addressShort}</span>` : ''}
         </div>
-        ${biz.style ? `<span class="card-style">${esc(biz.style)}</span>` : ''}
-        ${biz.description ? `<div class="card-desc">"${esc(biz.description)}"</div>` : ''}
-        ${draftSection}
+        <div class="card-meta" style="margin-top:0.4rem;">
+          ${hasEmail ? `<button class="copy-chip" data-copy-contact="${esc(biz.email)}">${copyIcon} ${esc(biz.email)}</button>` : '<span style="color:#94a3b8">No email found</span>'}
+          ${biz.phone ? `<button class="copy-chip" data-copy-contact="${esc(biz.phone)}">${copyIcon} ${esc(biz.phone)}</button>` : ''}
+        </div>
         <div class="card-actions">
-          ${hasEmail && liveUrl ? `<button class="btn btn-primary" data-copy>Copy Email</button>` : ''}
+          ${liveUrl ? `<a href="${esc(liveUrl)}" target="_blank" class="btn btn-ghost" style="text-decoration:none;">Preview</a>` : ''}
+          ${hasEmail && liveUrl ? `
+            <div class="email-popover-wrap">
+              <button class="btn btn-primary" data-copy>Copy Email Draft</button>
+              <div class="email-popover">
+                <div class="email-popover-label">Email Draft</div>
+                <div class="email-popover-body">${esc(draft)}</div>
+              </div>
+            </div>
+          ` : ''}
           ${!isSaved ? `<button class="btn btn-ghost" data-save>Save for Later</button>` : ''}
         </div>
       `;
+
+      // store draft text for copying
+      card._draft = draft;
 
       // copy email
       const copyBtn = card.querySelector('[data-copy]');
       if (copyBtn) {
         copyBtn.addEventListener('click', () => {
-          const textarea = card.querySelector('[data-draft]');
-          if (textarea) {
-            navigator.clipboard.writeText(textarea.value).then(() => {
-              copyBtn.textContent = 'Copied!';
-              copyBtn.classList.add('btn-copied');
-              copyBtn.classList.remove('btn-primary');
-              setTimeout(() => {
-                copyBtn.textContent = 'Copy Email';
-                copyBtn.classList.remove('btn-copied');
-                copyBtn.classList.add('btn-primary');
-              }, 2000);
-            });
-          }
+          navigator.clipboard.writeText(card._draft).then(() => {
+            copyBtn.textContent = 'Copied!';
+            copyBtn.classList.add('btn-copied');
+            copyBtn.classList.remove('btn-primary');
+            setTimeout(() => {
+              copyBtn.textContent = 'Copy Email';
+              copyBtn.classList.remove('btn-copied');
+              copyBtn.classList.add('btn-primary');
+            }, 2000);
+          });
         });
       }
+
+      // copy contact chips (email / phone)
+      card.querySelectorAll('[data-copy-contact]').forEach(chip => {
+        chip.addEventListener('click', () => {
+          const val = chip.getAttribute('data-copy-contact');
+          navigator.clipboard.writeText(val).then(() => {
+            const orig = chip.innerHTML;
+            chip.textContent = 'Copied!';
+            chip.classList.add('copied');
+            setTimeout(() => {
+              chip.innerHTML = orig;
+              chip.classList.remove('copied');
+            }, 1500);
+          });
+        });
+      });
 
       // save for later
       const saveBtn = card.querySelector('[data-save]');
