@@ -14,7 +14,7 @@ require('dotenv').config({ path: require('path').join(__dirname, '..', '.env') }
 const BASE = process.env.PLATTER_BASE_URL || 'http://localhost:3000';
 const { readData } = require('../lib/store');
 
-const QUERY = 'nail salons in San Francisco';
+const QUERY = process.env.QUERY || process.argv[2] || 'nail salons in San Francisco';
 const POLL_INTERVAL_MS = 5000;
 const MAX_WAIT_MS = 15 * 60 * 1000; // 15 min
 

@@ -13,5 +13,50 @@
     "slug": "dynasty-nail",
     "status": "deployed",
     "live_url": "https://dynasty-nail.onrender.com"
+  },
+  {
+    "id": "e55c2a37-861a-4995-8031-08e5945722be",
+    "name": "Luxe Nails",
+    "address": "520 Montgomery St UNIT 106, San Francisco, CA 94111, USA",
+    "phone": "(415) 318-6968",
+    "email": null,
+    "has_website": false,
+    "google_reviews": 52,
+    "google_rating": 4.2,
+    "style": null,
+    "description": "",
+    "slug": "luxe-nails",
+    "status": "deployed",
+    "live_url": "https://luxe-nails.onrender.com"
+  },
+  {
+    "id": "d6ad03a7-a15b-45e7-ba75-045345c5ad9b",
+    "name": "Blue pearl nails",
+    "address": "580 Union St, San Francisco, CA 94133, USA",
+    "phone": "(415) 212-2813",
+    "email": null,
+    "has_website": false,
+    "google_reviews": 38,
+    "google_rating": 5,
+    "style": null,
+    "description": "",
+    "slug": "blue-pearl-nails",
+    "status": "deployed",
+    "live_url": "https://blue-pearl-nails.onrender.com"
+  },
+  {
+    "id": "15a12af5-d458-4326-b808-1859851ce9b1",
+    "name": "Mohka House",
+    "address": "2139 MacArthur Blvd, Oakland, CA 94602, USA",
+    "phone": "(510) 479-3217",
+    "email": null,
+    "has_website": false,
+    "google_reviews": 303,
+    "google_rating": 4.9,
+    "style": null,
+    "description": "",
+    "slug": "mohka-house",
+    "status": "deployed",
+    "live_url": "https://mohka-house.onrender.com"
   }
 ]

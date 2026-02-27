@@ -7,5 +7,32 @@
     "email": null,
     "generated_at": "2026-02-27T21:21:02.046Z",
     "status": "active"
+  },
+  {
+    "id": "e55c2a37-861a-4995-8031-08e5945722be",
+    "name": "Luxe Nails",
+    "slug": "luxe-nails",
+    "live_url": "https://luxe-nails.onrender.com",
+    "email": null,
+    "generated_at": "2026-02-27T21:55:31.845Z",
+    "status": "active"
+  },
+  {
+    "id": "d6ad03a7-a15b-45e7-ba75-045345c5ad9b",
+    "name": "Blue pearl nails",
+    "slug": "blue-pearl-nails",
+    "live_url": "https://blue-pearl-nails.onrender.com",
+    "email": null,
+    "generated_at": "2026-02-27T21:55:31.847Z",
+    "status": "active"
+  },
+  {
+    "id": "15a12af5-d458-4326-b808-1859851ce9b1",
+    "name": "Mohka House",
+    "slug": "mohka-house",
+    "live_url": "https://mohka-house.onrender.com",
+    "email": null,
+    "generated_at": "2026-02-27T21:58:33.753Z",
+    "status": "active"
   }
 ]

@@ -7,6 +7,7 @@ const { readData, writeData } = require('../lib/store');
 const { slugify } = require('../lib/slug');
 const { validateSearchQuery } = require('../lib/query-validation');
 const { v4: uuidv4 } = require('uuid');
+const { alreadyExists } = require('../lib/dedupe');
 
 const searches = {};
 const BASE_URL = `http://localhost:${process.env.PORT || 3000}`;
@@ -71,8 +72,17 @@ async function runPipeline(searchId, query) {
     }
   }
 
-  search.total = noWebsitePlaces.length;
-  if (noWebsitePlaces.length === 0) {
+  // Dedupe: skip places that already exist in data (same name + address)
+  let existing = [];
+  try {
+    existing = await readData('businesses.json');
+  } catch (_) {}
+  const toProcess = noWebsitePlaces.filter(
+    (p) => !alreadyExists(existing, p.name, p.address)
+  );
+
+  search.total = toProcess.length;
+  if (toProcess.length === 0) {
     search.status = 'completed';
     return;
   }
@@ -175,7 +185,7 @@ async function runPipeline(searchId, query) {
     }
   };
 
-  await Promise.all(noWebsitePlaces.map(runOne));
+  await Promise.all(toProcess.map(runOne));
 }
 
 // GET /api/search/:search_id/status
