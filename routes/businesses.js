@@ -22,6 +22,16 @@ router.patch('/businesses/:id', async (req, res) => {
   }
 });
 
+// GET /api/generated — list all generated sites
+router.get('/generated', async (req, res) => {
+  try {
+    const list = await readData('generated.json');
+    res.json(list);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to read generated data' });
+  }
+});
+
 // POST /api/businesses/save — bulk save businesses (used by Dev A pipeline)
 router.post('/businesses/save', async (req, res) => {
   try {

@@ -10,7 +10,8 @@ function buildQuery(businessName, address) {
   return `Research the business '${businessName}' at ${address}. ` +
     `Use Yelp as your primary source; you may also use Google Reviews, Facebook, TripAdvisor, and other review or directory sites. ` +
     `Find: any email address, phone number, business hours (opening/closing times), social media links, and a short description of the business vibe and customer experience (do not repeat the address or phone in the description). ` +
-    `Then suggest a visual website style (e.g. 'modern minimalist', 'warm and luxurious', 'clean and clinical') based on what you find.`;
+    `Then suggest a visual website style (e.g. 'modern minimalist', 'warm and luxurious', 'clean and clinical') based on what you find, and include 3-5 objects or themes that represent the business (e.g. 'espresso cup, coffee beans, rustic wood' for a café). ` +
+    `Be as concise as possible. Call as few tools as possible — only enough to get the minimum required information.`;
 }
 
 // Create a research task for a business

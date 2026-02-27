@@ -58,5 +58,86 @@
     "slug": "mohka-house",
     "status": "deployed",
     "live_url": "https://mohka-house.onrender.com"
+  },
+  {
+    "id": "7bff8e4a-2af4-44b4-8e39-1d0c0e6f2694",
+    "name": "Cindy Hair Salon",
+    "address": "2652 Alum Rock Ave B, San Jose, CA 95116, USA",
+    "phone": "(408) 805-9243",
+    "email": null,
+    "has_website": false,
+    "google_reviews": 119,
+    "google_rating": 4.5,
+    "style": "healthy and vibrant",
+    "description": "High-rated, health-first salon experience Social : No social media links are currently listed. Services & Details (as listed on Yelp): Hair coloring, balayage, babylights, highlights, haircuts, eyelash extensions, Brazilian Blowouts, waxing Owner: Cindy N.",
+    "business_hours": "Monday: 9:00 AM – 7:00 PM; Tuesday: 9:00 AM – 7:00 PM; Wednesday: 9:00 AM – 7:00 PM; Thursday: 9:00 AM – 7:00 PM; Friday: 9:00 AM – 7:00 PM; Saturday: 9:00 AM – 7:00 PM; Sunday: Closed",
+    "social_media_links": [
+      "https://www.yelp.com/biz/cindy-hair-salon-san-jose-2"
+    ],
+    "slug": "cindy-hair-salon",
+    "status": "deployed",
+    "live_url": "https://platter-cindy-hair-salon.onrender.com"
+  },
+  {
+    "id": "57e355f9-4aee-4072-8b16-476b6ddf181a",
+    "name": "Selena Salon - Phenix Salon Suites",
+    "address": "925 Blossom Hill Rd 1509 Room 101, San Jose, CA 95123, USA",
+    "phone": "(510) 988-8889",
+    "email": "selena207020@gmail.com",
+    "has_website": false,
+    "google_reviews": 156,
+    "google_rating": 5,
+    "style": "details and customer",
+    "description": "Selena Salon details and customer vibe Contact : . com.",
+    "business_hours": "Monday: 9:00 AM – 7:00 PM; Tuesday: 9:00 AM – 7:00 PM; Wednesday: 9:00 AM – 7:00 PM; Thursday: 9:00 AM – 7:00 PM; Friday: 9:00 AM – 7:00 PM; Saturday: 9:00 AM – 7:00 PM; Sunday: 9:00 AM – 5:00 PM",
+    "social_media_links": [
+      "https://www.yelp.com/biz/selena-salon-san-jose",
+      "https://www.instagram.com/selena_salon__sanjose",
+      "https://www.tiktok.com/@selena_salon_sanjose",
+      "https://www.instagram.com/reel/DLea-GYgIVE/",
+      "https://www.tiktok.com/@selena_salon_sanjose/video/7530340263428951309"
+    ],
+    "slug": "selena-salon-phenix-salon-suites",
+    "status": "deployed",
+    "live_url": "https://platter-selena-salon-phenix-salon-suites.onrender.com"
+  },
+  {
+    "id": "0cc83df3-2f50-4ebb-8f2e-89b7a5141dbe",
+    "name": "The Modern Willow Glen",
+    "address": "1355 Lincoln Ave, San Jose, CA 95125, USA",
+    "phone": "(408) 275-9100",
+    "email": "modern.willowglen@gmail.com",
+    "has_website": false,
+    "google_reviews": 88,
+    "google_rating": 4.4,
+    "style": "Contemporary luxury with warm minimalism Clean, minimalist layout with ample white space Warm accent colors (soft golds, warm neutrals) High-quality imagery of color transformations and styling Approachable, professional typography Messaging that emphasizes personalization and inclusivity Before/after gallery highlights",
+    "description": "Modern salon with warm, personalized service willowglen@gmail.com. Primary source: Yelp business profile.",
+    "business_hours": "Monday: Closed; Tuesday: 10:00 AM – 8:00 PM; Wednesday: 10:00 AM – 8:00 PM; Thursday: 10:00 AM – 8:00 PM; Friday: 10:00 AM – 8:00 PM; Saturday: 9:00 AM – 7:00 PM; Sunday: 10:00 AM – 7:00 PM",
+    "social_media_links": [
+      "https://www.yelp.com/biz/the-modern-willow-glen-san-jose",
+      "https://www.instagram.com/themodern_willowglen/"
+    ],
+    "slug": "the-modern-willow-glen",
+    "status": "deployed",
+    "live_url": "https://platter-the-modern-willow-glen.onrender.com"
+  },
+  {
+    "id": "5edee696-30b1-41b5-a8d4-714329636308",
+    "name": "Primo Tactical Guns & Lingerie",
+    "address": "1617 N Broadway, Walnut Creek, CA 94596, USA",
+    "phone": "(650) 931-7653",
+    "email": null,
+    "has_website": false,
+    "google_reviews": 113,
+    "google_rating": 4.6,
+    "style": "Modern bold with warm sophistication — sleek, contemporary structure; inviting color palette and approachable typography; a subtle edgy accent to echo the brand’s unconventional pairing; and refined, high-end cues for lingerie",
+    "description": "Limited hours, standout Yelp reputation Contact : Phone . Email not publicly listed.",
+    "business_hours": "Monday: Closed; Tuesday: 5:00 – 6:00 PM; Wednesday: 5:00 – 6:00 PM; Thursday: 5:00 – 6:00 PM; Friday: Closed; Saturday: Closed; Sunday: Closed",
+    "social_media_links": [
+      "https://www.yelp.com/biz/primo-tactical-guns-and-lingerie-walnut-creek-2"
+    ],
+    "slug": "primo-tactical-guns-lingerie",
+    "status": "deployed",
+    "live_url": "https://platter-primo-tactical-guns-lingerie.onrender.com"
   }
 ]

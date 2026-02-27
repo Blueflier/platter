@@ -61,5 +61,41 @@
     "email": "hello@jadeblossomspa.com",
     "generated_at": "2026-02-27T22:15:55.744Z",
     "status": "active"
+  },
+  {
+    "id": "7bff8e4a-2af4-44b4-8e39-1d0c0e6f2694",
+    "name": "Cindy Hair Salon",
+    "slug": "cindy-hair-salon",
+    "live_url": "https://platter-cindy-hair-salon.onrender.com",
+    "email": null,
+    "generated_at": "2026-02-27T22:47:08.759Z",
+    "status": "active"
+  },
+  {
+    "id": "0cc83df3-2f50-4ebb-8f2e-89b7a5141dbe",
+    "name": "The Modern Willow Glen",
+    "slug": "the-modern-willow-glen",
+    "live_url": "https://platter-the-modern-willow-glen.onrender.com",
+    "email": "modern.willowglen@gmail.com",
+    "generated_at": "2026-02-27T22:50:15.169Z",
+    "status": "active"
+  },
+  {
+    "id": "57e355f9-4aee-4072-8b16-476b6ddf181a",
+    "name": "Selena Salon - Phenix Salon Suites",
+    "slug": "selena-salon-phenix-salon-suites",
+    "live_url": "https://platter-selena-salon-phenix-salon-suites.onrender.com",
+    "email": "selena207020@gmail.com",
+    "generated_at": "2026-02-27T22:50:27.250Z",
+    "status": "active"
+  },
+  {
+    "id": "5edee696-30b1-41b5-a8d4-714329636308",
+    "name": "Primo Tactical Guns & Lingerie",
+    "slug": "primo-tactical-guns-lingerie",
+    "live_url": "https://platter-primo-tactical-guns-lingerie.onrender.com",
+    "email": null,
+    "generated_at": "2026-02-27T22:57:36.558Z",
+    "status": "active"
   }
 ]
