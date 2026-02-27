@@ -13,6 +13,82 @@
       background: #e8f0fe;
       color: #1e293b;
       min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ---- 3D background canvas ---- */
+    #bg-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* ---- 3D config panel (Ctrl+D) ---- */
+    .scene-config {
+      display: none;
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      width: 260px;
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(12px);
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 1.25rem;
+      z-index: 200;
+      box-shadow: 0 8px 32px rgba(30,41,59,0.1);
+      font-size: 0.8rem;
+      color: #475569;
+    }
+
+    .scene-config.open { display: block; }
+
+    .scene-config h3 {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #1e293b;
+      margin-bottom: 0.75rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .scene-config h3 span {
+      font-size: 0.7rem;
+      color: #94a3b8;
+      font-weight: 400;
+    }
+
+    .cfg-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.6rem;
+    }
+
+    .cfg-row label {
+      font-size: 0.78rem;
+      color: #64748b;
+    }
+
+    .cfg-row input[type="range"] {
+      width: 110px;
+      accent-color: #6b9cf7;
+    }
+
+    .cfg-row input[type="checkbox"] {
+      accent-color: #6b9cf7;
+    }
+
+    .cfg-row .cfg-val {
+      font-size: 0.72rem;
+      color: #94a3b8;
+      min-width: 32px;
+      text-align: right;
     }
 
     /* ---- layout ---- */
@@ -20,6 +96,8 @@
       max-width: 860px;
       margin: 0 auto;
       padding: 2.5rem 1.5rem 4rem;
+      position: relative;
+      z-index: 1;
     }
 
     .header {
@@ -520,6 +598,47 @@
   </style>
 </head>
 <body>
+  <canvas id="bg-canvas"></canvas>
+
+  <!-- 3D config panel (Ctrl+D) -->
+  <div class="scene-config" id="sceneConfig">
+    <h3>Scene Config <span>Ctrl+D</span></h3>
+    <div class="cfg-row">
+      <label>Show 3D</label>
+      <input type="checkbox" id="cfgShow" checked>
+    </div>
+    <div class="cfg-row">
+      <label>Rotation Speed</label>
+      <input type="range" id="cfgRotSpeed" min="0" max="100" value="5">
+      <span class="cfg-val" id="cfgRotSpeedVal">0.0005</span>
+    </div>
+    <div class="cfg-row">
+      <label>Camera Distance</label>
+      <input type="range" id="cfgCamDist" min="2" max="30" value="13">
+      <span class="cfg-val" id="cfgCamDistVal">13</span>
+    </div>
+    <div class="cfg-row">
+      <label>Camera Height</label>
+      <input type="range" id="cfgCamHeight" min="-10" max="20" value="5">
+      <span class="cfg-val" id="cfgCamHeightVal">5</span>
+    </div>
+    <div class="cfg-row">
+      <label>Model Scale</label>
+      <input type="range" id="cfgScale" min="1" max="100" value="20">
+      <span class="cfg-val" id="cfgScaleVal">2.0</span>
+    </div>
+    <div class="cfg-row">
+      <label>Light Intensity</label>
+      <input type="range" id="cfgLightInt" min="0" max="100" value="73">
+      <span class="cfg-val" id="cfgLightIntVal">2.2</span>
+    </div>
+    <div class="cfg-row">
+      <label>Opacity</label>
+      <input type="range" id="cfgOpacity" min="0" max="100" value="64">
+      <span class="cfg-val" id="cfgOpacityVal">0.64</span>
+    </div>
+  </div>
+
   <div class="app">
     <!-- header: just text, no icon -->
     <div class="header">
@@ -913,6 +1032,174 @@
       d.textContent = str || '';
       return d.innerHTML;
     }
+  </script>
+
+  <!-- Three.js 3D background -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.163.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.163.0/examples/jsm/"
+    }
+  }
+  </script>
+  <script type="module">
+    import * as THREE from 'three';
+    import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+    const canvas = document.getElementById('bg-canvas');
+    const configPanel = document.getElementById('sceneConfig');
+
+    // --- config state ---
+    const cfg = {
+      show: true,
+      rotSpeed: 0.0005,
+      camDist: 13,
+      camHeight: 5,
+      scale: 2.0,
+      lightIntensity: 2.2,
+      opacity: 0.64,
+    };
+
+    // --- Three.js setup ---
+    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.2;
+
+    const scene = new THREE.Scene();
+
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+    camera.position.set(0, cfg.camHeight, cfg.camDist);
+    camera.lookAt(0, 0, 0);
+
+    // --- warm lighting ---
+    const ambient = new THREE.AmbientLight(0xfff0e0, 0.6);
+    scene.add(ambient);
+
+    // warm key light (sun-like)
+    const keyLight = new THREE.DirectionalLight(0xffe4b5, cfg.lightIntensity);
+    keyLight.position.set(5, 8, 4);
+    keyLight.castShadow = false;
+    scene.add(keyLight);
+
+    // warm fill light
+    const fillLight = new THREE.DirectionalLight(0xffd4a0, 0.5);
+    fillLight.position.set(-4, 3, -2);
+    scene.add(fillLight);
+
+    // soft warm rim
+    const rimLight = new THREE.PointLight(0xffb870, 0.4, 30);
+    rimLight.position.set(0, 6, -6);
+    scene.add(rimLight);
+
+    // --- load model ---
+    let model = null;
+    const loader = new GLTFLoader();
+    loader.load('/models/low_poly_nature.glb', (gltf) => {
+      model = gltf.scene;
+      model.scale.setScalar(cfg.scale);
+
+      // center model
+      const box = new THREE.Box3().setFromObject(model);
+      const center = box.getCenter(new THREE.Vector3());
+      model.position.sub(center);
+      model.position.y -= 1;
+
+      scene.add(model);
+    });
+
+    // --- animation loop ---
+    function animate() {
+      requestAnimationFrame(animate);
+
+      if (!cfg.show) {
+        canvas.style.opacity = '0';
+        return;
+      }
+
+      canvas.style.opacity = String(cfg.opacity);
+
+      if (model) {
+        model.rotation.y += cfg.rotSpeed;
+      }
+
+      camera.position.set(0, cfg.camHeight, cfg.camDist);
+      camera.lookAt(0, 0, 0);
+
+      keyLight.intensity = cfg.lightIntensity;
+
+      renderer.render(scene, camera);
+    }
+
+    animate();
+
+    // --- resize ---
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // --- config panel toggle (Ctrl+D) ---
+    document.addEventListener('keydown', (e) => {
+      if (e.ctrlKey && e.key === 'd') {
+        e.preventDefault();
+        configPanel.classList.toggle('open');
+      }
+    });
+
+    // --- config controls ---
+    const cfgShow = document.getElementById('cfgShow');
+    const cfgRotSpeed = document.getElementById('cfgRotSpeed');
+    const cfgRotSpeedVal = document.getElementById('cfgRotSpeedVal');
+    const cfgCamDist = document.getElementById('cfgCamDist');
+    const cfgCamDistVal = document.getElementById('cfgCamDistVal');
+    const cfgCamHeight = document.getElementById('cfgCamHeight');
+    const cfgCamHeightVal = document.getElementById('cfgCamHeightVal');
+    const cfgScale = document.getElementById('cfgScale');
+    const cfgScaleVal = document.getElementById('cfgScaleVal');
+    const cfgLightInt = document.getElementById('cfgLightInt');
+    const cfgLightIntVal = document.getElementById('cfgLightIntVal');
+    const cfgOpacity = document.getElementById('cfgOpacity');
+    const cfgOpacityVal = document.getElementById('cfgOpacityVal');
+
+    cfgShow.addEventListener('change', () => {
+      cfg.show = cfgShow.checked;
+    });
+
+    cfgRotSpeed.addEventListener('input', () => {
+      cfg.rotSpeed = cfgRotSpeed.value / 10000;
+      cfgRotSpeedVal.textContent = cfg.rotSpeed.toFixed(4);
+    });
+
+    cfgCamDist.addEventListener('input', () => {
+      cfg.camDist = Number(cfgCamDist.value);
+      cfgCamDistVal.textContent = cfg.camDist;
+    });
+
+    cfgCamHeight.addEventListener('input', () => {
+      cfg.camHeight = Number(cfgCamHeight.value);
+      cfgCamHeightVal.textContent = cfg.camHeight;
+    });
+
+    cfgScale.addEventListener('input', () => {
+      cfg.scale = cfgScale.value / 10;
+      cfgScaleVal.textContent = cfg.scale.toFixed(1);
+      if (model) model.scale.setScalar(cfg.scale);
+    });
+
+    cfgLightInt.addEventListener('input', () => {
+      cfg.lightIntensity = cfgLightInt.value / 33.3;
+      cfgLightIntVal.textContent = cfg.lightIntensity.toFixed(1);
+    });
+
+    cfgOpacity.addEventListener('input', () => {
+      cfg.opacity = cfgOpacity.value / 100;
+      cfgOpacityVal.textContent = cfg.opacity.toFixed(2);
+    });
   </script>
 </body>
 </html>
