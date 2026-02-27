@@ -22,6 +22,28 @@ router.patch('/businesses/:id', async (req, res) => {
   }
 });
 
+// DELETE /api/businesses/:id — remove a business from both data files
+router.delete('/businesses/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const businesses = await readData('businesses.json');
+    const filtered = businesses.filter(b => b.id !== id);
+    await writeData('businesses.json', filtered);
+
+    // Also remove from generated.json
+    try {
+      const generated = await readData('generated.json');
+      await writeData('generated.json', generated.filter(g => g.id !== id));
+    } catch {}
+
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('Delete error:', err);
+    res.status(500).json({ error: 'Delete failed' });
+  }
+});
+
 // GET /api/generated — list all generated sites
 router.get('/generated', async (req, res) => {
   try {

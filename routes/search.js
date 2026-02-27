@@ -8,6 +8,7 @@ const { slugify } = require('../lib/slug');
 const { validateSearchQuery } = require('../lib/query-validation');
 const { v4: uuidv4 } = require('uuid');
 const { alreadyExists } = require('../lib/dedupe');
+const polyhaven = require('../services/polyhaven');
 
 const searches = {};
 const BASE_URL = `http://localhost:${process.env.PORT || 3000}`;
@@ -96,7 +97,7 @@ async function runPipeline(searchId, query) {
 
   search.total = toProcess.length;
   if (toProcess.length === 0) {
-    log('No new businesses without websites found.');
+    log('No new businesses without websites found. Try a different search query.');
     search.status = 'completed';
     return;
   }
@@ -121,7 +122,7 @@ async function runPipeline(searchId, query) {
     }
 
     log(`[${place.name}] Waiting for research results...`);
-    let email = null, style = null, description = '', phoneSupplement = null, businessHours = null, socialMediaLinks = [];
+    let email = null, style = null, description = '', phoneSupplement = null, businessHours = null, socialMediaLinks = [], colorPalette = null;
     try {
       const parsed = await yutori.pollTask(taskId);
       email = parsed.email;
@@ -130,7 +131,21 @@ async function runPipeline(searchId, query) {
       phoneSupplement = parsed.phone || null;
       businessHours = parsed.business_hours || null;
       socialMediaLinks = Array.isArray(parsed.social_media_links) ? parsed.social_media_links : [];
+      colorPalette = parsed.color_palette || null;
       log(`[${place.name}] Research complete${email ? ` — found email: ${email}` : ' — no email found'}`);
+      // Look up 3D model from Poly Haven (always tries to find one)
+      log(`[${place.name}] Looking up 3D model${parsed.asset_keyword ? ` for "${parsed.asset_keyword}"` : ''}...`);
+      try {
+        const model = await polyhaven.findModel(parsed.asset_keyword);
+        if (model) {
+          place._model_url = model.url;
+          log(`[${place.name}] Found 3D model: ${model.asset_id}${model.fallback ? ' (curated fallback)' : ''}`);
+        } else {
+          log(`[${place.name}] No 3D model found — using geometric shapes`);
+        }
+      } catch (e) {
+        log(`[${place.name}] 3D model lookup failed — using geometric shapes`);
+      }
     } catch (err) {
       console.error('Yutori poll error for', place.name, err.message);
       description = place.editorial_summary || '';
@@ -153,6 +168,8 @@ async function runPipeline(searchId, query) {
       description: description || place.editorial_summary || '',
       business_hours: finalBusinessHours || null,
       social_media_links: socialMediaLinks,
+      color_palette: colorPalette,
+      model_url: place._model_url || null,
       slug,
       status: 'pending'
     };
@@ -164,9 +181,10 @@ async function runPipeline(searchId, query) {
       console.error('Store append error:', err);
     }
 
-    // Call POST /api/generate for this business
-    log(`[${place.name}] Generating website with AI...`);
-    let liveUrl = null;
+    // Call POST /api/generate for this business (generates 2 variants)
+    log(`[${place.name}] Generating websites with AI (3D + Classic)...`);
+    let liveUrl3d = null;
+    let liveUrlClassic = null;
     let emailDraft = null;
     try {
       const genRes = await fetch(`${BASE_URL}/api/generate`, {
@@ -182,14 +200,17 @@ async function runPipeline(searchId, query) {
           email: business.email,
           business_hours: business.business_hours || null,
           social_media_links: business.social_media_links || [],
+          color_palette: business.color_palette || null,
+          model_url: business.model_url || null,
           slug
         })
       });
       if (genRes.ok) {
         const gen = await genRes.json();
-        liveUrl = gen.live_url || null;
+        liveUrl3d = gen.live_url_3d || null;
+        liveUrlClassic = gen.live_url_classic || null;
         emailDraft = gen.email_draft || null;
-        log(`[${place.name}] Website deployed → ${liveUrl}`);
+        log(`[${place.name}] Websites deployed → 3D: ${liveUrl3d} | Classic: ${liveUrlClassic}`);
       } else {
         log(`[${place.name}] Website generation failed (${genRes.status})`);
       }
@@ -200,9 +221,10 @@ async function runPipeline(searchId, query) {
 
     const card = {
       ...business,
-      live_url: liveUrl,
+      live_url_3d: liveUrl3d,
+      live_url_classic: liveUrlClassic,
       email_draft: emailDraft,
-      status: liveUrl ? 'deployed' : business.status
+      status: (liveUrl3d || liveUrlClassic) ? 'deployed' : business.status
     };
 
     search.businesses.push(card);
@@ -213,7 +235,10 @@ async function runPipeline(searchId, query) {
     }
   };
 
-  await Promise.all(toProcess.map(runOne));
+  // Process businesses one at a time to stay within API rate limits
+  for (const place of toProcess) {
+    await runOne(place);
+  }
 }
 
 // GET /api/search/:search_id/status

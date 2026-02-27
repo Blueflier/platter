@@ -340,31 +340,6 @@
       display: block;
     }
 
-    .progress-labels {
-      display: flex;
-      width: 100%;
-      position: absolute;
-      bottom: 0;
-      left: 0;
-    }
-
-    .progress-labels span {
-      flex: 1;
-      text-align: center;
-      font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
-      font-size: 0.7rem;
-      color: #64748b;
-    }
-
-    .progress-labels span.active-label {
-      color: #1e293b;
-      font-weight: 600;
-    }
-
-    .progress-labels span.completed-label {
-      color: #6b9cf7;
-    }
-
     /* ---- results area ---- */
     .results-area {
       margin-top: 0.5rem;
@@ -560,6 +535,45 @@
       color: #065f46;
     }
 
+    /* ---- card detail popover on hover ---- */
+    .card {
+      position: relative;
+    }
+    .card-detail-popover {
+      display: none;
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      right: 0;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      box-shadow: 0 12px 40px rgba(30,41,59,0.12);
+      z-index: 40;
+      animation: popIn 0.15s ease-out;
+      font-size: 0.8rem;
+      color: #475569;
+      line-height: 1.5;
+    }
+    .card:hover .card-detail-popover {
+      display: block;
+    }
+    .card-detail-popover dt {
+      font-weight: 600;
+      color: #1e293b;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-top: 0.6rem;
+    }
+    .card-detail-popover dt:first-child {
+      margin-top: 0;
+    }
+    .card-detail-popover dd {
+      margin: 0.15rem 0 0 0;
+    }
+
     /* ---- email hover popover ---- */
     .email-popover-wrap {
       position: relative;
@@ -717,6 +731,52 @@
       <input type="range" id="cfgOpacity" min="0" max="100" value="64">
       <span class="cfg-val" id="cfgOpacityVal">0.64</span>
     </div>
+    <h3 style="margin-top:0.75rem">Progress Bar <span>debug</span></h3>
+    <div class="cfg-row">
+      <label>Bar Height</label>
+      <input type="range" id="cfgBarH" min="10" max="200" value="40">
+      <span class="cfg-val" id="cfgBarHVal">40</span>
+    </div>
+    <div class="cfg-row">
+      <label>Seg Height</label>
+      <input type="range" id="cfgSegH" min="5" max="100" value="40">
+      <span class="cfg-val" id="cfgSegHVal">0.40</span>
+    </div>
+    <div class="cfg-row">
+      <label>Seg Depth</label>
+      <input type="range" id="cfgSegD" min="5" max="100" value="25">
+      <span class="cfg-val" id="cfgSegDVal">0.25</span>
+    </div>
+    <div class="cfg-row">
+      <label>Gap</label>
+      <input type="range" id="cfgBarGap" min="0" max="50" value="6">
+      <span class="cfg-val" id="cfgBarGapVal">0.06</span>
+    </div>
+    <div class="cfg-row">
+      <label>Frustum</label>
+      <input type="range" id="cfgFrustum" min="10" max="100" value="40">
+      <span class="cfg-val" id="cfgFrustumVal">4.0</span>
+    </div>
+    <div class="cfg-row">
+      <label>X</label>
+      <input type="range" id="cfgBarX" min="-300" max="300" value="0">
+      <span class="cfg-val" id="cfgBarXVal">0.0</span>
+    </div>
+    <div class="cfg-row">
+      <label>Y</label>
+      <input type="range" id="cfgBarY" min="-300" max="300" value="0">
+      <span class="cfg-val" id="cfgBarYVal">0.0</span>
+    </div>
+    <div class="cfg-row">
+      <label>Z</label>
+      <input type="range" id="cfgBarZ" min="-300" max="300" value="0">
+      <span class="cfg-val" id="cfgBarZVal">0.0</span>
+    </div>
+    <div class="cfg-row">
+      <label>Scale</label>
+      <input type="range" id="cfgBarScale" min="10" max="300" value="100">
+      <span class="cfg-val" id="cfgBarScaleVal">1.0</span>
+    </div>
   </div>
 
   <div class="app">
@@ -757,13 +817,6 @@
     <!-- 3D progress bar -->
     <div id="progressWrap">
       <canvas id="progress-canvas"></canvas>
-      <div class="progress-labels">
-        <span id="plbl-0">Search</span>
-        <span id="plbl-1">Filter</span>
-        <span id="plbl-2">Research</span>
-        <span id="plbl-3">Generate</span>
-        <span id="plbl-4">Deploy</span>
-      </div>
     </div>
 
     <!-- results area with saved toggle -->
@@ -818,8 +871,6 @@
       /Generating website/,
       /Website deployed|All businesses processed/,
     ];
-    const stageLabels = ['plbl-0','plbl-1','plbl-2','plbl-3','plbl-4'].map(id => document.getElementById(id));
-
     function deriveStage(msg) {
       for (let i = stageRegexes.length - 1; i >= 0; i--) {
         if (stageRegexes[i].test(msg)) return i;
@@ -830,9 +881,6 @@
     function setProgressStage(idx) {
       if (idx <= window.progressStage) return;
       window.progressStage = idx;
-      stageLabels.forEach((lbl, i) => {
-        lbl.className = i < idx ? 'completed-label' : i === idx ? 'active-label' : '';
-      });
       if (typeof window.updateProgressBar === 'function') {
         window.updateProgressBar(idx);
       }
@@ -997,7 +1045,7 @@
       logPanel.classList.remove('open');
       window.progressStage = -1;
       progressWrap.classList.remove('open');
-      stageLabels.forEach(lbl => { lbl.className = ''; });
+
       if (typeof window.updateProgressBar === 'function') window.updateProgressBar(-1);
       updateSavedBadge();
       statusEl.innerHTML = '<span class="spinner"></span> Starting...';
@@ -1028,8 +1076,18 @@
           if (data.status === 'completed') {
             clearInterval(pollTimer);
             sessionStorage.removeItem('activeSearchId');
-            statusEl.textContent = `${data.total} total`;
-            loadResults(searchId);
+            if (data.total === 0) {
+              // No viable businesses — reset progress bar and prompt new search
+              progressWrap.classList.remove('open');
+              window.progressStage = -1;
+        
+              if (typeof window.updateProgressBar === 'function') window.updateProgressBar(-1);
+              statusEl.textContent = 'All businesses already have websites — try a different search.';
+              searchInput.focus();
+            } else {
+              statusEl.textContent = `${data.total} total`;
+              loadResults(searchId);
+            }
           } else if (data.status === 'failed') {
             clearInterval(pollTimer);
             sessionStorage.removeItem('activeSearchId');
@@ -1071,22 +1129,28 @@
       card.dataset.id = biz.id;
 
       const hasEmail = biz.email && biz.email !== 'null';
-      const liveUrl = biz.live_url || '';
+      const liveUrl3d = biz.live_url_3d || '';
+      const liveUrlClassic = biz.live_url_classic || '';
+      const hasAnyUrl = liveUrl3d || liveUrlClassic;
 
       // Build condensed address: just city-level
       const addressShort = biz.address ? esc(biz.address) : '';
 
       // Email draft text (hidden, used for popover)
-      const draft = hasEmail && liveUrl
-        ? `Subject: We built you a free website\n\nHi ${biz.name},\n\nWe noticed you didn't have a website so we built one for you — take a look:\n${liveUrl}\n\nHappy to chat if you have questions.\n— Platter`
+      const draft = hasEmail && hasAnyUrl
+        ? `Subject: We built you a free website — pick your favorite\n\nHi ${biz.name},\n\nWe noticed you didn't have a website so we built two options for you:\n${liveUrl3d ? `\nOption A (Interactive 3D): ${liveUrl3d}` : ''}${liveUrlClassic ? `\nOption B (Classic): ${liveUrlClassic}` : ''}\n\nTake a look and let us know which one you prefer — or if you'd like any changes.\n\n— Platter`
         : '';
 
       const copyIcon = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 011.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 00-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 01-1.125-1.125v-9.25m0 0a9.06 9.06 0 011.5-.124H15a3.75 3.75 0 013.75 3.75v5.624"/></svg>`;
+      const trashIcon = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:16px;height:16px;"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"/></svg>`;
 
       card.innerHTML = `
         <div class="card-top">
           <div class="card-name">${esc(biz.name)}</div>
-          ${biz.google_rating ? `<div class="card-rating"><span class="star">&#9733;</span> ${biz.google_rating} (${biz.google_reviews})</div>` : ''}
+          <div style="display:flex;align-items:center;gap:0.5rem;">
+            ${biz.google_rating ? `<div class="card-rating"><span class="star">&#9733;</span> ${biz.google_rating} (${biz.google_reviews})</div>` : ''}
+            <button class="btn-icon" data-delete title="Delete" style="background:none;border:none;cursor:pointer;padding:4px;color:#94a3b8;display:flex;align-items:center;">${trashIcon}</button>
+          </div>
         </div>
         <div class="card-meta">
           ${addressShort ? `<span>${addressShort}</span>` : ''}
@@ -1096,8 +1160,9 @@
           ${biz.phone ? `<button class="copy-chip" data-copy-contact="${esc(biz.phone)}">${copyIcon} ${esc(biz.phone)}</button>` : ''}
         </div>
         <div class="card-actions">
-          ${liveUrl ? `<a href="${esc(liveUrl)}" target="_blank" class="btn btn-ghost" style="text-decoration:none;">Preview</a>` : ''}
-          ${hasEmail && liveUrl ? `
+          ${liveUrl3d ? `<a href="${esc(liveUrl3d)}" target="_blank" class="btn btn-ghost" style="text-decoration:none;">Preview 3D</a>` : ''}
+          ${liveUrlClassic ? `<a href="${esc(liveUrlClassic)}" target="_blank" class="btn btn-ghost" style="text-decoration:none;">Preview Classic</a>` : ''}
+          ${hasEmail && hasAnyUrl ? `
             <div class="email-popover-wrap">
               <button class="btn btn-primary" data-copy>Copy Email Draft</button>
               <div class="email-popover">
@@ -1107,6 +1172,15 @@
             </div>
           ` : ''}
           ${!isSaved ? `<button class="btn btn-ghost" data-save>Save for Later</button>` : ''}
+        </div>
+        <div class="card-detail-popover">
+          <dl>
+            ${biz.description ? `<dt>About</dt><dd>${esc(biz.description)}</dd>` : ''}
+            ${biz.style ? `<dt>Design Style</dt><dd>${esc(biz.style)}</dd>` : ''}
+            ${biz.business_hours ? `<dt>Hours</dt><dd>${esc(biz.business_hours)}</dd>` : ''}
+            ${biz.address ? `<dt>Address</dt><dd>${esc(biz.address)}</dd>` : ''}
+            ${biz.social_media_links && biz.social_media_links.length ? `<dt>Social</dt><dd>${biz.social_media_links.map(u => `<a href="${esc(u)}" target="_blank" style="color:#6b9cf7;word-break:break-all;">${esc(u)}</a>`).join('<br>')}</dd>` : ''}
+          </dl>
         </div>
       `;
 
@@ -1166,6 +1240,17 @@
           savedItems.push(biz);
           updateSavedBadge();
           renderCard(biz, savedCardsEl, true);
+        });
+      }
+
+      // delete
+      const delBtn = card.querySelector('[data-delete]');
+      if (delBtn) {
+        delBtn.addEventListener('click', async () => {
+          try {
+            await fetch(`/api/businesses/${biz.id}`, { method: 'DELETE' });
+          } catch {}
+          card.remove();
         });
       }
 
@@ -1358,97 +1443,197 @@
 
       const pScene = new THREE.Scene();
 
-      // orthographic camera with slight isometric tilt
-      const frustum = 4;
+      const barCfg = { frustum: 4, segH: 0.4, segD: 0.25, gap: 0.06 };
+
       const aspect = pCanvas.clientWidth / pCanvas.clientHeight;
       const pCamera = new THREE.OrthographicCamera(
-        -frustum * aspect / 2, frustum * aspect / 2,
-        frustum / 2, -frustum / 2, 0.1, 50
+        -barCfg.frustum * aspect / 2, barCfg.frustum * aspect / 2,
+        barCfg.frustum / 2, -barCfg.frustum / 2, 0.1, 50
       );
       pCamera.position.set(0, 2.5, 5);
       pCamera.lookAt(0, 0, 0);
 
-      // lighting
-      const pAmbient = new THREE.AmbientLight(0xffffff, 0.8);
+      const pAmbient = new THREE.AmbientLight(0xfff5e6, 0.6);
       pScene.add(pAmbient);
-      const pDir = new THREE.DirectionalLight(0xffffff, 1.2);
+      const pDir = new THREE.DirectionalLight(0xffe8cc, 1.0);
       pDir.position.set(3, 5, 4);
       pScene.add(pDir);
+      const pWarm = new THREE.PointLight(0xffaa55, 0.8, 20);
+      pWarm.position.set(-2, 2, 3);
+      pScene.add(pWarm);
+      const pWarm2 = new THREE.PointLight(0xff8833, 0.4, 20);
+      pWarm2.position.set(3, 1, 2);
+      pScene.add(pWarm2);
 
-      // build 5 segments
       const segCount = 5;
       const totalW = 6;
-      const gap = 0.06;
-      const segW = (totalW - gap * (segCount - 1)) / segCount;
-      const segH = 0.4;
-      const segD = 0.25;
       const inactiveColor = 0xdde4ee;
       const activeColor = 0x6b9cf7;
+      const labels = ['Search', 'Filter', 'Research', 'Generate', 'Deploy'];
 
       const barGroup = new THREE.Group();
       const boxes = [];
-      const materials = [];
+      const boxData = []; // { side, front, label }
+      let currentStage = -1;
 
-      for (let i = 0; i < segCount; i++) {
-        const geo = new THREE.BoxGeometry(segW, segH, segD);
-        const mat = new THREE.MeshStandardMaterial({ color: inactiveColor, flatShading: true });
-        const mesh = new THREE.Mesh(geo, mat);
-        const x = -totalW / 2 + segW / 2 + i * (segW + gap);
-        mesh.position.set(x, 0, 0);
-        barGroup.add(mesh);
-        boxes.push(mesh);
-        materials.push(mat);
+      function makeTextTex(text, bgHex, textHex) {
+        const c = document.createElement('canvas');
+        c.width = 256; c.height = 128;
+        const ctx = c.getContext('2d');
+        ctx.fillStyle = bgHex;
+        ctx.fillRect(0, 0, 256, 128);
+        ctx.fillStyle = textHex;
+        ctx.font = 'bold 36px Inter, system-ui, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(text, 128, 64);
+        const tex = new THREE.CanvasTexture(c);
+        tex.minFilter = THREE.LinearFilter;
+        return tex;
+      }
+
+      function buildBars() {
+        // clear old
+        while (barGroup.children.length) barGroup.remove(barGroup.children[0]);
+        boxes.length = 0;
+        boxData.length = 0;
+
+        const segW = (totalW - barCfg.gap * (segCount - 1)) / segCount;
+        for (let i = 0; i < segCount; i++) {
+          const geo = new THREE.BoxGeometry(segW, barCfg.segH, barCfg.segD);
+          const sideMat = new THREE.MeshStandardMaterial({ color: inactiveColor, flatShading: true });
+          const frontMat = new THREE.MeshStandardMaterial({
+            map: makeTextTex(labels[i], '#dde4ee', '#64748b'),
+            flatShading: true
+          });
+          // BoxGeometry face order: +x, -x, +y, -y, +z, -z
+          const mats = [sideMat, sideMat, sideMat, sideMat, frontMat, sideMat];
+          const mesh = new THREE.Mesh(geo, mats);
+          const x = -totalW / 2 + segW / 2 + i * (segW + barCfg.gap);
+          mesh.position.set(x, 0, 0);
+          barGroup.add(mesh);
+          boxes.push(mesh);
+          boxData.push({ side: sideMat, front: frontMat, label: labels[i] });
+        }
+        // re-apply current stage colors
+        applyColors(currentStage);
       }
 
       pScene.add(barGroup);
 
-      // edge outline for active segment
       let activeOutline = null;
 
-      function updateBar(stageIndex) {
-        // remove old outline
-        if (activeOutline) {
-          barGroup.remove(activeOutline);
-          activeOutline = null;
-        }
-
+      function applyColors(stageIndex) {
+        if (activeOutline) { barGroup.remove(activeOutline); activeOutline = null; }
         for (let i = 0; i < segCount; i++) {
-          if (stageIndex < 0) {
-            materials[i].color.setHex(inactiveColor);
-          } else if (i <= stageIndex) {
-            materials[i].color.setHex(activeColor);
-          } else {
-            materials[i].color.setHex(inactiveColor);
-          }
+          const active = stageIndex >= 0 && i <= stageIndex;
+          boxData[i].side.color.setHex(active ? activeColor : inactiveColor);
+          boxData[i].front.map.dispose();
+          boxData[i].front.map = makeTextTex(
+            boxData[i].label,
+            active ? '#6b9cf7' : '#dde4ee',
+            active ? '#ffffff' : '#64748b'
+          );
+          boxData[i].front.needsUpdate = true;
         }
-
-        // add outline on active segment
         if (stageIndex >= 0 && stageIndex < segCount) {
           const edges = new THREE.EdgesGeometry(boxes[stageIndex].geometry);
-          activeOutline = new THREE.LineSegments(
-            edges,
-            new THREE.LineBasicMaterial({ color: 0x000000, linewidth: 1.5 })
-          );
+          activeOutline = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0x000000, linewidth: 1.5 }));
           activeOutline.position.copy(boxes[stageIndex].position);
           barGroup.add(activeOutline);
         }
       }
 
+      function updateBar(stageIndex) {
+        currentStage = stageIndex;
+        if (boxData.length) applyColors(stageIndex);
+      }
+
       window.updateProgressBar = updateBar;
 
-      // resize handler
-      function resizeProgress() {
+      buildBars();
+
+      function updateCamera() {
         const w = pCanvas.clientWidth;
         const h = pCanvas.clientHeight;
         if (w === 0 || h === 0) return;
         const a = w / h;
-        pCamera.left = -frustum * a / 2;
-        pCamera.right = frustum * a / 2;
-        pCamera.top = frustum / 2;
-        pCamera.bottom = -frustum / 2;
+        pCamera.left = -barCfg.frustum * a / 2;
+        pCamera.right = barCfg.frustum * a / 2;
+        pCamera.top = barCfg.frustum / 2;
+        pCamera.bottom = -barCfg.frustum / 2;
         pCamera.updateProjectionMatrix();
         pRenderer.setSize(w, h, false);
       }
+
+      // --- debug controls ---
+      const cfgBarH = document.getElementById('cfgBarH');
+      const cfgBarHVal = document.getElementById('cfgBarHVal');
+      const cfgSegH = document.getElementById('cfgSegH');
+      const cfgSegHVal = document.getElementById('cfgSegHVal');
+      const cfgSegD = document.getElementById('cfgSegD');
+      const cfgSegDVal = document.getElementById('cfgSegDVal');
+      const cfgBarGap = document.getElementById('cfgBarGap');
+      const cfgBarGapVal = document.getElementById('cfgBarGapVal');
+      const cfgFrustum = document.getElementById('cfgFrustum');
+      const cfgFrustumVal = document.getElementById('cfgFrustumVal');
+
+      cfgBarH.addEventListener('input', () => {
+        const v = parseInt(cfgBarH.value);
+        cfgBarHVal.textContent = v;
+        pCanvas.style.height = v + 'px';
+        updateCamera();
+      });
+      cfgSegH.addEventListener('input', () => {
+        barCfg.segH = parseInt(cfgSegH.value) / 100;
+        cfgSegHVal.textContent = barCfg.segH.toFixed(2);
+        buildBars();
+      });
+      cfgSegD.addEventListener('input', () => {
+        barCfg.segD = parseInt(cfgSegD.value) / 100;
+        cfgSegDVal.textContent = barCfg.segD.toFixed(2);
+        buildBars();
+      });
+      cfgBarGap.addEventListener('input', () => {
+        barCfg.gap = parseInt(cfgBarGap.value) / 100;
+        cfgBarGapVal.textContent = barCfg.gap.toFixed(2);
+        buildBars();
+      });
+      cfgFrustum.addEventListener('input', () => {
+        barCfg.frustum = parseInt(cfgFrustum.value) / 10;
+        cfgFrustumVal.textContent = barCfg.frustum.toFixed(1);
+        updateCamera();
+      });
+
+      const cfgBarX = document.getElementById('cfgBarX');
+      const cfgBarXVal = document.getElementById('cfgBarXVal');
+      const cfgBarY = document.getElementById('cfgBarY');
+      const cfgBarYVal = document.getElementById('cfgBarYVal');
+      const cfgBarZ = document.getElementById('cfgBarZ');
+      const cfgBarZVal = document.getElementById('cfgBarZVal');
+      const cfgBarScale = document.getElementById('cfgBarScale');
+      const cfgBarScaleVal = document.getElementById('cfgBarScaleVal');
+
+      cfgBarX.addEventListener('input', () => {
+        const v = parseInt(cfgBarX.value) / 100;
+        cfgBarXVal.textContent = v.toFixed(1);
+        barGroup.position.x = v;
+      });
+      cfgBarY.addEventListener('input', () => {
+        const v = parseInt(cfgBarY.value) / 100;
+        cfgBarYVal.textContent = v.toFixed(1);
+        barGroup.position.y = v;
+      });
+      cfgBarZ.addEventListener('input', () => {
+        const v = parseInt(cfgBarZ.value) / 100;
+        cfgBarZVal.textContent = v.toFixed(1);
+        barGroup.position.z = v;
+      });
+      cfgBarScale.addEventListener('input', () => {
+        const v = parseInt(cfgBarScale.value) / 100;
+        cfgBarScaleVal.textContent = v.toFixed(1);
+        barGroup.scale.setScalar(v);
+      });
 
       let lastW = 0, lastH = 0;
 
@@ -1457,22 +1642,10 @@
         const w = pCanvas.clientWidth;
         const h = pCanvas.clientHeight;
         if (w === 0 || h === 0) return;
-
-        // resize renderer + camera when canvas size changes (e.g. first show)
         if (w !== lastW || h !== lastH) {
           lastW = w; lastH = h;
-          const a = w / h;
-          pCamera.left = -frustum * a / 2;
-          pCamera.right = frustum * a / 2;
-          pCamera.top = frustum / 2;
-          pCamera.bottom = -frustum / 2;
-          pCamera.updateProjectionMatrix();
-          pRenderer.setSize(w, h, false);
+          updateCamera();
         }
-
-        barGroup.rotation.y += 0.001;
-        if (barGroup.rotation.y > 0.15) barGroup.rotation.y = -0.15;
-
         pRenderer.render(pScene, pCamera);
       }
       progressLoop();

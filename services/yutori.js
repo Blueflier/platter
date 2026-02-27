@@ -11,6 +11,11 @@ function buildQuery(businessName, address) {
     `Use Yelp as your primary source; you may also use Google Reviews, Facebook, TripAdvisor, and other review or directory sites. ` +
     `Find: any email address, phone number, business hours (opening/closing times), social media links, and a short description of the business vibe and customer experience (do not repeat the address or phone in the description). ` +
     `Then suggest a visual website style (e.g. 'modern minimalist', 'warm and luxurious', 'clean and clinical') based on what you find, and include 3-5 objects or themes that represent the business (e.g. 'espresso cup, coffee beans, rustic wood' for a café). ` +
+    `Finally, suggest a website color palette that authentically matches what this type of business would actually use. Output it in EXACTLY this format on its own line:\n` +
+    `COLOR_PALETTE: theme=dark|light, bg=#hex, text=#hex, accent=#hex, accent2=#hex\n` +
+    `Choose colors that match the INDUSTRY and VIBE — e.g. a gun shop or tattoo parlor should use dark themes with blacks/gunmetals/brass; a nail salon might use soft pastels; a barbershop might use dark moody tones with gold; a bakery might use warm creams. Match the business identity, not a generic template.\n` +
+    `Also suggest ONE 3D object keyword for a floating background decoration from a 3D model library (e.g. "pistol", "coffee_cup", "chair", "flower_pot", "barber_chair"). Output it on its own line:\n` +
+    `3D_ASSET: keyword\n` +
     `Be as concise as possible. Call as few tools as possible — only enough to get the minimum required information.`;
 }
 
@@ -79,11 +84,25 @@ function extractSocialLinks(text) {
 
 // Parse Yutori result: extract email, style, description (vibe only), phone, business_hours, social_media_links
 function parseResult(text) {
-  const out = { email: null, style: null, description: '', phone: null, business_hours: null, social_media_links: [] };
+  const out = { email: null, style: null, description: '', phone: null, business_hours: null, social_media_links: [], color_palette: null, asset_keyword: null };
   if (!text || typeof text !== 'string') return out;
   const raw = text.trim();
   const t = stripHtml(raw);
   if (!t) return out;
+  // Color palette — COLOR_PALETTE: theme=dark, bg=#0a0a0a, text=#f5f5f5, accent=#b5a642, accent2=#4a5568
+  const paletteMatch = t.match(/COLOR_PALETTE:\s*theme\s*=\s*(dark|light)\s*,\s*bg\s*=\s*(#[0-9a-fA-F]{3,8})\s*,\s*text\s*=\s*(#[0-9a-fA-F]{3,8})\s*,\s*accent\s*=\s*(#[0-9a-fA-F]{3,8})\s*,\s*accent2\s*=\s*(#[0-9a-fA-F]{3,8})/i);
+  if (paletteMatch) {
+    out.color_palette = {
+      theme: paletteMatch[1].toLowerCase(),
+      bg: paletteMatch[2],
+      text: paletteMatch[3],
+      accent: paletteMatch[4],
+      accent2: paletteMatch[5],
+    };
+  }
+  // 3D asset keyword — 3D_ASSET: pistol
+  const assetMatch = t.match(/3D_ASSET:\s*([^\n.,]+)/i);
+  if (assetMatch) out.asset_keyword = assetMatch[1].trim().toLowerCase() || null;
   // Email
   const emailMatch = t.match(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/);
   if (emailMatch) out.email = emailMatch[0];
