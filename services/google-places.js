@@ -25,7 +25,7 @@ async function getDetails(placeId) {
   if (!API_KEY) throw new Error('GOOGLE_PLACES_API_KEY is not set');
   const url = new URL(`${BASE_URL}/details/json`);
   url.searchParams.set('place_id', placeId);
-  url.searchParams.set('fields', 'name,formatted_address,formatted_phone_number,website,rating,user_ratings_total,editorial_summary');
+  url.searchParams.set('fields', 'name,formatted_address,formatted_phone_number,website,rating,user_ratings_total,editorial_summary,opening_hours');
   url.searchParams.set('key', API_KEY);
 
   const res = await fetch(url.toString());

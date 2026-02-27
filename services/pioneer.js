@@ -5,7 +5,7 @@ const ENDPOINT = process.env.PIONEER_ENDPOINT;
 const MODEL_ID = process.env.PIONEER_MODEL_ID;
 
 // Generate landing page HTML for a business
-async function generateSite({ name, description, style, phone, address }) {
+async function generateSite({ name, description, style, phone, address, business_hours, social_media_links }) {
   // TODO: call Pioneer API once request/response format is confirmed
   //
   // const res = await fetch(ENDPOINT, {
@@ -45,6 +45,8 @@ async function generateSite({ name, description, style, phone, address }) {
   <div class="info">
     ${address ? `<p>${escHtml(address)}</p>` : ''}
     ${phone ? `<p>Call us: ${escHtml(phone)}</p>` : ''}
+    ${business_hours ? `<p>Hours: ${escHtml(business_hours)}</p>` : ''}
+    ${(social_media_links && social_media_links.length) ? `<p>Follow: ${social_media_links.map(u => `<a href="${escHtml(u)}">${escHtml(u)}</a>`).join(', ')}</p>` : ''}
     <a class="cta" href="tel:${escHtml(phone || '')}">Get in Touch</a>
   </div>
 </body>

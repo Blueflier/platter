@@ -5,6 +5,7 @@ const googlePlaces = require('../services/google-places');
 const yutori = require('../services/yutori');
 const { readData, writeData } = require('../lib/store');
 const { slugify } = require('../lib/slug');
+const { validateSearchQuery } = require('../lib/query-validation');
 const { v4: uuidv4 } = require('uuid');
 
 const searches = {};
@@ -14,8 +15,9 @@ const BASE_URL = `http://localhost:${process.env.PORT || 3000}`;
 router.post('/search', async (req, res) => {
   const { query } = req.body || {};
   const q = typeof query === 'string' ? query.trim() : '';
-  if (!q) {
-    return res.status(400).json({ error: 'Missing or empty query' });
+  const validation = validateSearchQuery(q);
+  if (!validation.valid) {
+    return res.status(400).json({ error: validation.error });
   }
 
   const searchId = uuidv4();
@@ -50,6 +52,9 @@ async function runPipeline(searchId, query) {
       const detail = await googlePlaces.getDetails(ref.place_id);
       if (!detail) continue;
       if (detail.website) continue; // has website — skip
+      const openingHours = detail.opening_hours && detail.opening_hours.weekday_text && Array.isArray(detail.opening_hours.weekday_text)
+        ? detail.opening_hours.weekday_text.join('; ')
+        : null;
       noWebsitePlaces.push({
         place_id: ref.place_id,
         name: detail.name || ref.name || 'Unknown',
@@ -58,7 +63,8 @@ async function runPipeline(searchId, query) {
         website: detail.website || null,
         rating: detail.rating != null ? detail.rating : null,
         user_ratings_total: detail.user_ratings_total != null ? detail.user_ratings_total : 0,
-        editorial_summary: detail.editorial_summary ? (detail.editorial_summary.overview || '') : ''
+        editorial_summary: detail.editorial_summary ? (detail.editorial_summary.overview || '') : '',
+        opening_hours: openingHours
       });
     } catch (e) {
       console.error('getDetails error for', ref.place_id, e.message);
@@ -83,29 +89,36 @@ async function runPipeline(searchId, query) {
       return;
     }
 
-    let email = null, style = null, description = null;
+    let email = null, style = null, description = '', phoneSupplement = null, businessHours = null, socialMediaLinks = [];
     try {
       const parsed = await yutori.pollTask(taskId);
       email = parsed.email;
       style = parsed.style;
-      description = parsed.description;
+      description = parsed.description || '';
+      phoneSupplement = parsed.phone || null;
+      businessHours = parsed.business_hours || null;
+      socialMediaLinks = Array.isArray(parsed.social_media_links) ? parsed.social_media_links : [];
     } catch (err) {
       console.error('Yutori poll error for', place.name, err.message);
       description = place.editorial_summary || '';
     }
+    const finalPhone = place.phone || phoneSupplement;
+    const finalBusinessHours = place.opening_hours || businessHours;
 
     const id = uuidv4();
     const business = {
       id,
       name: place.name,
       address: place.address,
-      phone: place.phone,
+      phone: finalPhone,
       email: email || null,
       has_website: false,
       google_reviews: place.user_ratings_total,
       google_rating: place.rating,
       style: style || null,
       description: description || place.editorial_summary || '',
+      business_hours: finalBusinessHours || null,
+      social_media_links: socialMediaLinks,
       slug,
       status: 'pending'
     };
@@ -134,6 +147,8 @@ async function runPipeline(searchId, query) {
           phone: business.phone,
           address: business.address,
           email: business.email,
+          business_hours: business.business_hours || null,
+          social_media_links: business.social_media_links || [],
           slug
         })
       });

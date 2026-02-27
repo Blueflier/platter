@@ -39,7 +39,7 @@ async function testGooglePlaces() {
   console.log('  Google Places: OK');
 }
 
-// --- 3. Yutori (services/yutori.js) — create only, no full poll ---
+// --- 3. Yutori (services/yutori.js) — create only ---
 async function testYutoriCreate() {
   const yutori = require('../services/yutori');
   if (!process.env.YUTORI_API_KEY) {
@@ -52,9 +52,33 @@ async function testYutoriCreate() {
   console.log('  Yutori create: OK');
 }
 
+// --- 3b. Yutori full layer: create + poll to completion, check result shape ---
+async function testYutoriFullResearch() {
+  const yutori = require('../services/yutori');
+  if (!process.env.YUTORI_API_KEY) {
+    console.log('  Yutori full research: SKIP (no key)');
+    return;
+  }
+  const { createTask, pollTask } = yutori;
+  const { task_id } = await createTask('Luxe Nails', '123 Market St, San Francisco');
+  assert(task_id, 'createTask returned task_id');
+  try {
+    const result = await pollTask(task_id);
+    assert(result !== null && typeof result === 'object', 'pollTask returns object');
+    assert('email' in result && 'style' in result && 'description' in result, 'result has email, style, description');
+    console.log('  Yutori full research: OK');
+  } catch (err) {
+    if (err.message && err.message.includes('timeout')) {
+      console.log('  Yutori full research: SKIP (task did not complete within 10 min)');
+    } else {
+      throw err;
+    }
+  }
+}
+
 // --- 4. Search API (routes) — server must be running ---
 async function testSearchEndpoints() {
-  // POST /api/search
+  // POST /api/search — success
   const postRes = await fetch(`${BASE}/api/search`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -81,8 +105,36 @@ async function testSearchEndpoints() {
   console.log('  Search API (POST + status + results): OK');
 }
 
-// --- 5. Results shape (after pipeline completes or from in-memory) ---
-async function testResultsShape() {
+// --- 4b. Search API — 400/404 per spec ---
+async function testSearchApiErrors() {
+  const badId = '00000000-0000-0000-0000-000000000000';
+
+  const emptyPost = await fetch(`${BASE}/api/search`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ query: '' })
+  });
+  assert(emptyPost.status === 400, 'POST /api/search returns 400 for empty query');
+
+  const noQueryPost = await fetch(`${BASE}/api/search`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({})
+  });
+  assert(noQueryPost.status === 400, 'POST /api/search returns 400 for missing query');
+
+  const status404 = await fetch(`${BASE}/api/search/${badId}/status`);
+  assert(status404.status === 404, 'GET status returns 404 for unknown search_id');
+
+  const results404 = await fetch(`${BASE}/api/results/${badId}`);
+  assert(results404.status === 404, 'GET results returns 404 for unknown search_id');
+
+  console.log('  Search API (400/404): OK');
+}
+
+// --- 5. Results shape + businesses.json read (after pipeline completes or from in-memory) ---
+async function testResultsShapeAndStore() {
+  const { readData } = require('../lib/store');
   const postRes = await fetch(`${BASE}/api/search`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -104,15 +156,22 @@ async function testResultsShape() {
       assert(b.has_website === false, 'business has_website is false');
       assert(typeof b.google_reviews === 'number' && (b.google_rating === null || typeof b.google_rating === 'number'), 'google_reviews/rating');
       assert('style' in b && 'description' in b, 'has style and description');
-      console.log('  Results shape (one business): OK');
+      // Spec: Dev A writes to businesses.json via store — validate read
+      const fromFile = await readData('businesses.json');
+      assert(Array.isArray(fromFile), 'businesses.json is an array');
+      const found = fromFile.find((x) => x.id === b.id);
+      assert(found, 'business appears in businesses.json after pipeline');
+      assert(found.name === b.name && found.slug === b.slug && found.has_website === false, 'stored record has required schema (name, slug, has_website)');
+      assert('address' in found && 'phone' in found && 'email' in found && 'google_reviews' in found && 'google_rating' in found && 'style' in found && 'description' in found && 'status' in found, 'stored record has full schema fields');
+      console.log('  Results shape + businesses.json read: OK');
       return;
     }
     if (st.status === 'completed' && lastResults.length === 0) {
-      console.log('  Results shape: SKIP (pipeline completed with 0 no-website businesses)');
+      console.log('  Results shape + store: SKIP (pipeline completed with 0 no-website businesses)');
       return;
     }
   }
-  console.log('  Results shape: SKIP (no result within 90s; pipeline may still be running)');
+  console.log('  Results shape + store: SKIP (no result within 90s; pipeline may still be running)');
 }
 
 async function main() {
@@ -127,11 +186,17 @@ async function main() {
     console.log('3. Yutori create');
     await testYutoriCreate();
 
+    console.log('3b. Yutori full research (create + poll; may take up to ~2 min)');
+    await testYutoriFullResearch();
+
     console.log('4. Search endpoints');
     await testSearchEndpoints();
 
-    console.log('5. Results shape (may wait up to 90s for one result)');
-    await testResultsShape();
+    console.log('4b. Search API 400/404');
+    await testSearchApiErrors();
+
+    console.log('5. Results shape + businesses.json read (may wait up to 90s for one result)');
+    await testResultsShapeAndStore();
 
     console.log('\nAll validations passed.');
   } catch (err) {

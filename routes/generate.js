@@ -11,7 +11,7 @@ const WEBSITES_DIR = path.join(__dirname, '..', 'websites');
 
 // POST /api/generate — generate site, deploy, return draft
 router.post('/generate', async (req, res) => {
-  const { id, name, description, style, phone, address, email, slug } = req.body;
+  const { id, name, description, style, phone, address, email, slug, business_hours, social_media_links } = req.body;
 
   if (!slug || !name) {
     return res.status(400).json({ error: 'Missing required fields: slug, name' });
@@ -19,7 +19,7 @@ router.post('/generate', async (req, res) => {
 
   try {
     // 1. Generate HTML via Pioneer
-    const html = await pioneer.generateSite({ name, description, style, phone, address });
+    const html = await pioneer.generateSite({ name, description, style, phone, address, business_hours, social_media_links });
 
     // 2. Write to websites/{slug}/index.html
     const siteDir = path.join(WEBSITES_DIR, slug);

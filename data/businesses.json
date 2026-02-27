@@ -1,1 +1,17 @@
-[]
+[
+  {
+    "id": "66783ba8-806a-41a9-bb7d-1aaaed2843a5",
+    "name": "Dynasty Nail",
+    "address": "107 Stevenson St, San Francisco, CA 94105, USA",
+    "phone": "(415) 975-8654",
+    "email": null,
+    "has_website": false,
+    "google_reviews": 90,
+    "google_rating": 4.1,
+    "style": null,
+    "description": "",
+    "slug": "dynasty-nail",
+    "status": "deployed",
+    "live_url": "https://dynasty-nail.onrender.com"
+  }
+]
