@@ -41,9 +41,10 @@ async function runPipeline(searchId, query) {
 
   log(`Searching Google Places for "${query}"...`);
 
+  const googleQuery = / within \d+\s*miles?/i.test(query) ? query : `${query} within 20 miles`;
   let placeRefs = [];
   try {
-    placeRefs = await googlePlaces.textSearch(query);
+    placeRefs = await googlePlaces.textSearchAllPages(googleQuery, {}, 60);
   } catch (err) {
     console.error('Google Places textSearch:', err);
     log('Google Places search failed.');
@@ -51,7 +52,7 @@ async function runPipeline(searchId, query) {
     return;
   }
 
-  log(`Found ${placeRefs.length} places. Checking for existing websites...`);
+  log(`Found ${placeRefs.length} places (up to 3 pages). Checking for existing websites...`);
 
   const noWebsitePlaces = [];
   for (let i = 0; i < placeRefs.length; i++) {
