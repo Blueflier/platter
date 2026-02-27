@@ -3,7 +3,7 @@ const express = require('express');
 const router = express.Router();
 const googlePlaces = require('../services/google-places');
 const yutori = require('../services/yutori');
-const { readData, writeData } = require('../lib/store');
+const { readData, writeData, appendData } = require('../lib/store');
 const { slugify } = require('../lib/slug');
 const { validateSearchQuery } = require('../lib/query-validation');
 const { v4: uuidv4 } = require('uuid');
@@ -133,11 +133,9 @@ async function runPipeline(searchId, query) {
       status: 'pending'
     };
 
-    // Append one business to businesses.json (read -> append -> write)
+    // Append one business to businesses.json (atomic)
     try {
-      const list = await readData('businesses.json');
-      list.push({ ...business });
-      await writeData('businesses.json', list);
+      await appendData('businesses.json', { ...business });
     } catch (err) {
       console.error('Store append error:', err);
     }

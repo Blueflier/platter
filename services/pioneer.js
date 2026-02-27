@@ -54,9 +54,10 @@ YOU ALWAYS:
 - Initialize AOS at the bottom: AOS.init({ duration: 800, once: true })
 - The Three.js scene MUST be clearly visible and beautiful — this is the main differentiator. If someone screenshots the page, the 3D elements should be obvious and impressive.`;
 
-async function generateSite({ name, description, style, phone, address }) {
+async function generateSite({ name, description, style, phone, address, email, business_hours, social_media_links }) {
   const desc = description || 'A local business proudly serving the community.';
   const sty = style || 'clean and modern';
+  const socialLinks = Array.isArray(social_media_links) ? social_media_links : [];
 
   const userPrompt = `Build a Three.js landing page for: ${name}
 
@@ -64,6 +65,9 @@ About: ${desc}
 Design vibe: ${sty}
 Phone: ${phone || 'N/A'}
 Address: ${address || 'N/A'}
+Email: ${email || 'N/A'}
+Business Hours: ${business_hours || 'N/A'}
+Social Media: ${socialLinks.length ? socialLinks.join(', ') : 'None'}
 
 Pick a Three.js background scene that matches the "${sty}" vibe. Make the CTA buttons bold and obvious. Keep the 3D subtle — it should enhance, not distract.`;
 

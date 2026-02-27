@@ -5,7 +5,7 @@ const path = require('path');
 const router = express.Router();
 const pioneer = require('../services/pioneer');
 const render = require('../services/render');
-const { readData, writeData } = require('../lib/store');
+const { appendData, updateData } = require('../lib/store');
 
 const WEBSITES_DIR = path.join(__dirname, '..', 'websites');
 
@@ -19,7 +19,7 @@ router.post('/generate', async (req, res) => {
 
   try {
     // 1. Generate HTML via Pioneer
-    const html = await pioneer.generateSite({ name, description, style, phone, address, business_hours, social_media_links });
+    const html = await pioneer.generateSite({ name, description, style, phone, address, email, business_hours, social_media_links });
 
     // 2. Write to websites/{slug}/index.html
     const siteDir = path.join(WEBSITES_DIR, slug);
@@ -29,9 +29,8 @@ router.post('/generate', async (req, res) => {
     // 3. Deploy via Render (push to GitHub + create Render static site)
     const liveUrl = await render.deploy(slug, html);
 
-    // 4. Update generated.json
-    const generated = await readData('generated.json');
-    generated.push({
+    // 4. Update generated.json (atomic append)
+    await appendData('generated.json', {
       id,
       name,
       slug,
@@ -40,16 +39,12 @@ router.post('/generate', async (req, res) => {
       generated_at: new Date().toISOString(),
       status: 'active'
     });
-    await writeData('generated.json', generated);
 
-    // 5. Update business status in businesses.json
-    const businesses = await readData('businesses.json');
-    const biz = businesses.find(b => b.id === id);
-    if (biz) {
+    // 5. Update business status in businesses.json (atomic update)
+    await updateData('businesses.json', b => b.id === id, biz => {
       biz.status = 'deployed';
       biz.live_url = liveUrl;
-      await writeData('businesses.json', businesses);
-    }
+    });
 
     // 6. Build email draft
     const emailDraft = email
