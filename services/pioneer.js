@@ -1,58 +1,89 @@
 // --- DEV B owns this file ---
+// Site generation via DeepSeek (HTML) + Pioneer (light tasks)
 
-const API_KEY = process.env.PIONEER_API_KEY;
-const ENDPOINT = process.env.PIONEER_ENDPOINT;
-const MODEL_ID = process.env.PIONEER_MODEL_ID;
+const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
+const PIONEER_API_KEY = process.env.PIONEER_API_KEY;
+const PIONEER_ENDPOINT = process.env.PIONEER_ENDPOINT;
+const PIONEER_MODEL_ID = process.env.PIONEER_MODEL_ID;
 
-// Generate landing page HTML for a business
+const SYSTEM_PROMPT = `You are an elite frontend developer who builds stunning, award-winning single-page websites. You write a single complete HTML file with all CSS and JS inline. Your sites look like they were designed by a top agency.
+
+Design principles you follow:
+- Clean, generous whitespace and modern typography (Google Fonts via CDN)
+- Smooth scroll-triggered animations using AOS (Animate On Scroll) library via CDN
+- Subtle gradient backgrounds and glassmorphism accents
+- Mobile-first responsive design with fluid typography (clamp)
+- High contrast text, accessible color choices
+- Elegant hover states and transitions on interactive elements
+- A clear visual hierarchy: hero, about, contact, footer
+- Professional micro-interactions (button hover scales, smooth scrolls)
+
+CDN libraries you include in every site:
+- Google Fonts (pick 1-2 fonts that match the style)
+- AOS: https://unpkg.com/aos@2.3.1/dist/aos.css and https://unpkg.com/aos@2.3.1/dist/aos.js
+
+You ALWAYS:
+- Return ONLY the complete HTML. No markdown, no explanation, no code fences.
+- Start with <!DOCTYPE html> and end with </html>
+- Initialize AOS at the bottom: AOS.init({ duration: 800, once: true })
+- Use semantic HTML (header, main, section, footer)
+- Include a click-to-call link for the phone number
+- Include a Google Maps link for the address
+- Add a "Website built by Platter" credit in the footer with a link to https://platter.site`;
+
+// Generate landing page HTML via DeepSeek
 async function generateSite({ name, description, style, phone, address }) {
-  // TODO: call Pioneer API once request/response format is confirmed
-  //
-  // const res = await fetch(ENDPOINT, {
-  //   method: 'POST',
-  //   headers: {
-  //     'Authorization': `Bearer ${API_KEY}`,
-  //     'Content-Type': 'application/json'
-  //   },
-  //   body: JSON.stringify({ model_id: MODEL_ID, name, description, style, phone, address })
-  // });
-  // const { html } = await res.json();
-  // return html;
+  const desc = description || 'A local business proudly serving the community.';
+  const sty = style || 'clean and modern';
 
-  // Placeholder: return a styled landing page
-  return `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${escHtml(name)}</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: system-ui, sans-serif; background: #fafafa; color: #1a1a1a; }
-    .hero { padding: 4rem 2rem; text-align: center; background: #111; color: #fff; }
-    .hero h1 { font-size: 2.5rem; margin-bottom: 0.5rem; }
-    .hero p { font-size: 1.1rem; opacity: 0.8; max-width: 500px; margin: 0 auto; }
-    .info { max-width: 600px; margin: 2rem auto; padding: 0 1.5rem; }
-    .info p { margin-bottom: 0.75rem; font-size: 1rem; line-height: 1.6; }
-    .cta { display: inline-block; margin-top: 1rem; padding: 0.75rem 2rem; background: #111; color: #fff; text-decoration: none; border-radius: 8px; }
-  </style>
-</head>
-<body>
-  <div class="hero">
-    <h1>${escHtml(name)}</h1>
-    <p>${escHtml(description || '')}</p>
-  </div>
-  <div class="info">
-    ${address ? `<p>${escHtml(address)}</p>` : ''}
-    ${phone ? `<p>Call us: ${escHtml(phone)}</p>` : ''}
-    <a class="cta" href="tel:${escHtml(phone || '')}">Get in Touch</a>
-  </div>
-</body>
-</html>`;
+  const userPrompt = `Build a landing page for: ${name}
+
+About: ${desc}
+Design style: ${sty}
+Phone: ${phone || 'N/A'}
+Address: ${address || 'N/A'}
+
+Sections: hero with business name and tagline, about/description, contact info, footer. Pick a color palette that matches "${sty}". Make it feel premium.`;
+
+  const res = await fetch('https://api.deepseek.com/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${DEEPSEEK_API_KEY}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      model: 'deepseek-chat',
+      messages: [
+        { role: 'system', content: SYSTEM_PROMPT },
+        { role: 'user', content: userPrompt },
+      ],
+      max_tokens: 8000,
+      temperature: 0.7,
+    }),
+  });
+
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`DeepSeek API error (${res.status}): ${err}`);
+  }
+
+  const data = await res.json();
+  const raw = data.choices?.[0]?.message?.content || '';
+  const html = stripCodeFences(raw);
+
+  if (!html.includes('<!DOCTYPE html>') && !html.includes('<html')) {
+    throw new Error('DeepSeek returned invalid HTML');
+  }
+
+  return html;
 }
 
-function escHtml(str) {
-  return (str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+// Strip markdown code fences if model wraps output
+function stripCodeFences(str) {
+  return str
+    .replace(/^```(?:html)?\s*\n?/i, '')
+    .replace(/\n?```\s*$/, '')
+    .trim();
 }
 
 module.exports = { generateSite };

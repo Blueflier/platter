@@ -17,7 +17,7 @@
 
     /* ---- layout ---- */
     .app {
-      max-width: 680px;
+      max-width: 860px;
       margin: 0 auto;
       padding: 2.5rem 1.5rem 4rem;
     }
@@ -25,20 +25,234 @@
     .header {
       display: flex;
       align-items: center;
-      justify-content: space-between;
       margin-bottom: 2rem;
     }
 
-    .wordmark {
-      font-size: 0.9rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: #a1a1aa;
+    .logo {
+      font-size: 1.35rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: #fafafa;
       text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
     }
 
-    .saved-toggle {
+    .logo-icon {
+      width: 28px;
+      height: 28px;
+      background: linear-gradient(135deg, #818cf8, #c084fc);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+    }
+
+    /* ---- search ---- */
+    .search-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .search-wrap {
+      position: relative;
+      flex: 1;
+    }
+
+    .search-wrap svg {
+      position: absolute;
+      left: 1.1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 18px;
+      height: 18px;
+      color: #52525b;
+      pointer-events: none;
+    }
+
+    #searchInput {
+      width: 100%;
+      padding: 0.95rem 1rem 0.95rem 3rem;
+      font-size: 1.05rem;
+      font-family: inherit;
+      color: #fafafa;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 14px;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    #searchInput::placeholder { color: #52525b; }
+    #searchInput:focus {
+      border-color: rgba(129,140,248,0.5);
+      box-shadow: 0 0 0 3px rgba(129,140,248,0.1);
+    }
+
+    /* typing placeholder */
+    .search-wrap .typed-placeholder {
+      position: absolute;
+      left: 3rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.05rem;
+      color: #52525b;
+      pointer-events: none;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    .search-wrap .typed-placeholder .cursor {
+      display: inline-block;
+      width: 1px;
+      height: 1.1em;
+      background: #52525b;
+      vertical-align: text-bottom;
+      margin-left: 1px;
+      animation: blink 1s step-end infinite;
+    }
+
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+
+    /* info button */
+    .info-btn {
+      width: 42px;
+      height: 42px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      color: #71717a;
+      cursor: pointer;
+      font-size: 1.05rem;
+      font-weight: 600;
+      font-family: 'Georgia', serif;
+      font-style: italic;
+      transition: border-color 0.15s, color 0.15s, background 0.15s;
+    }
+
+    .info-btn:hover {
+      border-color: rgba(129,140,248,0.4);
+      color: #a1a1aa;
+      background: rgba(255,255,255,0.06);
+    }
+
+    /* ---- info modal ---- */
+    .modal-overlay {
       display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(4px);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-overlay.open { display: flex; }
+
+    .modal {
+      background: #18181b;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 16px;
+      padding: 2rem;
+      max-width: 520px;
+      width: 90%;
+      position: relative;
+      animation: modalIn 0.2s ease-out;
+    }
+
+    @keyframes modalIn {
+      from { opacity: 0; transform: scale(0.95) translateY(8px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 8px;
+      color: #71717a;
+      cursor: pointer;
+      font-size: 1.1rem;
+      transition: background 0.15s;
+    }
+
+    .modal-close:hover { background: rgba(255,255,255,0.1); }
+
+    .modal h2 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+
+    .modal ol {
+      padding-left: 1.3rem;
+      color: #a1a1aa;
+      font-size: 0.9rem;
+      line-height: 1.8;
+    }
+
+    .modal ol li { margin-bottom: 0.4rem; }
+    .modal ol li strong { color: #fafafa; font-weight: 500; }
+
+    .modal p.hint {
+      margin-top: 1rem;
+      font-size: 0.82rem;
+      color: #52525b;
+      font-style: italic;
+    }
+
+    /* ---- results area ---- */
+    .results-area {
+      margin-top: 0.5rem;
+    }
+
+    .results-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+
+    .results-header .status {
+      font-size: 0.85rem;
+      color: #71717a;
+      min-height: 1.3em;
+    }
+
+    .results-header .status .spinner {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border: 2px solid rgba(255,255,255,0.1);
+      border-top-color: #818cf8;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      vertical-align: middle;
+      margin-right: 0.4rem;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .saved-toggle {
+      display: inline-flex;
       align-items: center;
       gap: 0.4rem;
       padding: 0.45rem 1rem;
@@ -55,63 +269,10 @@
     .saved-toggle:hover { background: rgba(255,255,255,0.08); }
     .saved-toggle.active { color: #c084fc; border-color: rgba(192,132,252,0.3); }
 
-    /* ---- search ---- */
-    .search-wrap {
-      position: relative;
-      margin-bottom: 1.5rem;
+    .saved-toggle svg {
+      width: 14px;
+      height: 14px;
     }
-
-    .search-wrap svg {
-      position: absolute;
-      left: 1rem;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 18px;
-      height: 18px;
-      color: #52525b;
-      pointer-events: none;
-    }
-
-    #searchInput {
-      width: 100%;
-      padding: 0.85rem 1rem 0.85rem 2.8rem;
-      font-size: 1rem;
-      font-family: inherit;
-      color: #fafafa;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 12px;
-      outline: none;
-      transition: border-color 0.15s, box-shadow 0.15s;
-    }
-
-    #searchInput::placeholder { color: #52525b; }
-    #searchInput:focus {
-      border-color: rgba(129,140,248,0.5);
-      box-shadow: 0 0 0 3px rgba(129,140,248,0.1);
-    }
-
-    /* ---- status ---- */
-    .status {
-      font-size: 0.85rem;
-      color: #71717a;
-      margin-bottom: 1.5rem;
-      min-height: 1.3em;
-    }
-
-    .status .spinner {
-      display: inline-block;
-      width: 12px;
-      height: 12px;
-      border: 2px solid rgba(255,255,255,0.1);
-      border-top-color: #818cf8;
-      border-radius: 50%;
-      animation: spin 0.6s linear infinite;
-      vertical-align: middle;
-      margin-right: 0.4rem;
-    }
-
-    @keyframes spin { to { transform: rotate(360deg); } }
 
     /* ---- cards ---- */
     .cards { display: flex; flex-direction: column; gap: 1rem; }
@@ -318,23 +479,59 @@
 </head>
 <body>
   <div class="app">
+    <!-- header: logo top-left -->
     <div class="header">
-      <a href="/" class="wordmark">Platter</a>
-      <button class="saved-toggle" id="savedToggle">
-        Saved <span id="savedCount">0</span>
-      </button>
+      <a href="/" class="logo">
+        <div class="logo-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>
+        </div>
+        Platter
+      </a>
     </div>
 
-    <div class="search-wrap">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg>
-      <input type="text" id="searchInput" placeholder="nail salons in San Francisco" autofocus>
+    <!-- search row with info button -->
+    <div class="search-row">
+      <div class="search-wrap">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg>
+        <input type="text" id="searchInput" placeholder="" autofocus>
+        <div class="typed-placeholder" id="typedPlaceholder"><span id="typedText"></span><span class="cursor"></span></div>
+      </div>
+      <button class="info-btn" id="infoBtn" title="How to use Platter">i</button>
     </div>
 
-    <div class="status" id="status"></div>
-    <div class="cards" id="cards"></div>
-    <div class="saved-section" id="savedSection" style="display:none;">
-      <h3>Saved for Later</h3>
-      <div class="cards" id="savedCards"></div>
+    <!-- info modal -->
+    <div class="modal-overlay" id="infoModal">
+      <div class="modal">
+        <button class="modal-close" id="modalClose">&times;</button>
+        <h2>How to use Platter</h2>
+        <ol>
+          <li><strong>Search</strong> for a type of business and location (e.g. "bakeries in Oakland")</li>
+          <li>Platter finds businesses that <strong>don't have a website</strong> yet</li>
+          <li>We <strong>auto-generate a website</strong> for each one and draft an outreach email</li>
+          <li><strong>Copy the email</strong> and send it to the business owner</li>
+          <li>Use <strong>Save for Later</strong> to bookmark businesses you want to follow up on</li>
+        </ol>
+        <p class="hint">Tip: Be specific with your search to get the best results.</p>
+      </div>
+    </div>
+
+    <!-- results area with saved toggle -->
+    <div class="results-area">
+      <div class="results-header">
+        <div class="status" id="status"></div>
+        <button class="saved-toggle" id="savedToggle">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z"/></svg>
+          <span id="savedToggleLabel">Show Saved</span>
+          <span id="savedCount">0</span>
+        </button>
+      </div>
+
+      <div class="cards" id="cards"></div>
+
+      <div class="saved-section" id="savedSection" style="display:none;">
+        <h3>Saved for Later</h3>
+        <div class="cards" id="savedCards"></div>
+      </div>
     </div>
   </div>
 
@@ -346,12 +543,87 @@
     const savedCardsEl = document.getElementById('savedCards');
     const savedToggle = document.getElementById('savedToggle');
     const savedCountEl = document.getElementById('savedCount');
+    const savedToggleLabel = document.getElementById('savedToggleLabel');
+    const infoBtn = document.getElementById('infoBtn');
+    const infoModal = document.getElementById('infoModal');
+    const modalClose = document.getElementById('modalClose');
+    const typedPlaceholder = document.getElementById('typedPlaceholder');
+    const typedText = document.getElementById('typedText');
 
     let debounceTimer;
     let currentSearchId = null;
     let pollTimer = null;
     let savedVisible = false;
     let savedItems = [];
+
+    // ---- typing placeholder animation ----
+    const placeholderExamples = [
+      'nail salons in San Francisco',
+      'taquerias in the Mission District',
+      'barber shops in Oakland',
+      'yoga studios in Berkeley',
+      'auto repair in San Jose',
+      'bakeries in Palo Alto',
+      'pet groomers in Fremont',
+      'flower shops in Walnut Creek',
+      'tattoo parlors in San Mateo',
+      'coffee roasters in Santa Cruz',
+    ];
+
+    let exampleIndex = 0;
+    let charIndex = 0;
+    let isDeleting = false;
+    let typeTimer = null;
+
+    function typeLoop() {
+      // hide when user is typing
+      if (searchInput.value.length > 0) {
+        typedPlaceholder.style.display = 'none';
+        typeTimer = setTimeout(typeLoop, 300);
+        return;
+      }
+      typedPlaceholder.style.display = '';
+
+      const current = placeholderExamples[exampleIndex];
+
+      if (!isDeleting) {
+        charIndex++;
+        typedText.textContent = current.slice(0, charIndex);
+        if (charIndex >= current.length) {
+          // pause at full text
+          typeTimer = setTimeout(() => { isDeleting = true; typeLoop(); }, 2000);
+          return;
+        }
+        typeTimer = setTimeout(typeLoop, 60 + Math.random() * 40);
+      } else {
+        charIndex--;
+        typedText.textContent = current.slice(0, charIndex);
+        if (charIndex <= 0) {
+          isDeleting = false;
+          exampleIndex = (exampleIndex + 1) % placeholderExamples.length;
+          typeTimer = setTimeout(typeLoop, 400);
+          return;
+        }
+        typeTimer = setTimeout(typeLoop, 30);
+      }
+    }
+
+    typeLoop();
+
+    // hide placeholder on focus if empty (cursor still shows)
+    searchInput.addEventListener('input', () => {
+      typedPlaceholder.style.display = searchInput.value.length > 0 ? 'none' : '';
+    });
+
+    // ---- info modal ----
+    infoBtn.addEventListener('click', () => { infoModal.classList.add('open'); });
+    modalClose.addEventListener('click', () => { infoModal.classList.remove('open'); });
+    infoModal.addEventListener('click', (e) => {
+      if (e.target === infoModal) infoModal.classList.remove('open');
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') infoModal.classList.remove('open');
+    });
 
     // --- search triggers ---
     searchInput.addEventListener('input', () => {
@@ -374,8 +646,55 @@
     savedToggle.addEventListener('click', () => {
       savedVisible = !savedVisible;
       savedToggle.classList.toggle('active', savedVisible);
+      savedToggleLabel.textContent = savedVisible ? 'Hide Saved' : 'Show Saved';
       savedSection.style.display = savedVisible ? 'block' : 'none';
     });
+
+    // --- mock data for UI preview ---
+    const mockBusinesses = [
+      {
+        id: 'mock-1',
+        name: 'Sunrise Nails & Spa',
+        google_rating: 4.7,
+        google_reviews: 238,
+        address: '1842 Irving St, San Francisco, CA 94122',
+        phone: '(415) 555-0142',
+        email: 'sunrise.nails.sf@gmail.com',
+        live_url: 'https://sunrisenailssf.platter.site',
+        style: 'Elegant & Calm',
+        description: 'A neighborhood gem known for their meticulous gel work and relaxing atmosphere. Loyal clientele of 10+ years.',
+      },
+      {
+        id: 'mock-2',
+        name: 'Golden Gate Auto Repair',
+        google_rating: 4.9,
+        google_reviews: 412,
+        address: '750 Bay Shore Blvd, San Francisco, CA 94124',
+        phone: '(415) 555-0387',
+        email: null,
+        live_url: 'https://goldengateauto.platter.site',
+        style: 'Bold & Trustworthy',
+        description: 'Family-owned since 1998. Specializes in European imports. The go-to shop on Yelp for honest pricing.',
+      },
+      {
+        id: 'mock-3',
+        name: 'Masa\'s Taqueria',
+        google_rating: 4.5,
+        google_reviews: 189,
+        address: '2987 24th St, San Francisco, CA 94110',
+        phone: '(415) 555-0219',
+        email: 'masataqueria@gmail.com',
+        live_url: 'https://masastaqueria.platter.site',
+        style: 'Vibrant & Warm',
+        description: 'Beloved Mission District taqueria famous for their al pastor and house-made horchata. Cash only, always a line.',
+      },
+    ];
+
+    // render mock cards on load
+    statusEl.textContent = `${mockBusinesses.length} businesses found.`;
+    for (const biz of mockBusinesses) {
+      renderCard(biz, cardsEl, false);
+    }
 
     // --- search flow ---
     async function startSearch(query) {
@@ -532,7 +851,6 @@
 
     function updateSavedBadge() {
       savedCountEl.textContent = savedItems.length;
-      savedToggle.style.display = savedItems.length > 0 ? 'inline-flex' : 'none';
     }
 
     function esc(str) {

@@ -1,1 +1,29 @@
-[]
+[
+  {
+    "id": "test-001",
+    "name": "Sunrise Nails & Spa",
+    "slug": "sunrise-nails-sf",
+    "live_url": "https://platter-sunrise-nails-sf.onrender.com",
+    "email": "sunrise.nails.sf@gmail.com",
+    "generated_at": "2026-02-27T20:45:45.710Z",
+    "status": "active"
+  },
+  {
+    "id": "test-002",
+    "name": "Masa's Taqueria",
+    "slug": "masas-taqueria",
+    "live_url": "https://platter-masas-taqueria.onrender.com",
+    "email": "masataqueria@gmail.com",
+    "generated_at": "2026-02-27T21:14:22.212Z",
+    "status": "active"
+  },
+  {
+    "id": "test-ds-001",
+    "name": "Jade Blossom Nail Spa",
+    "slug": "jade-blossom-nail-spa",
+    "live_url": "https://platter-jade-blossom-nail-spa.onrender.com",
+    "email": "hello@jadeblossomspa.com",
+    "generated_at": "2026-02-27T21:35:50.505Z",
+    "status": "active"
+  }
+]
