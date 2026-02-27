@@ -26,8 +26,8 @@ router.post('/generate', async (req, res) => {
     await fs.mkdir(siteDir, { recursive: true });
     await fs.writeFile(path.join(siteDir, 'index.html'), html);
 
-    // 3. Deploy via Render
-    const liveUrl = await render.deploy(slug);
+    // 3. Deploy via Render (push to GitHub + create Render static site)
+    const liveUrl = await render.deploy(slug, html);
 
     // 4. Update generated.json
     const generated = await readData('generated.json');

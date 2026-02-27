@@ -10,101 +10,305 @@
 
     body {
       font-family: 'Inter', system-ui, -apple-system, sans-serif;
-      background: #09090b;
-      color: #fafafa;
+      background: #e8f0fe;
+      color: #1e293b;
       min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ---- 3D background canvas ---- */
+    #bg-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* ---- 3D config panel (Ctrl+D) ---- */
+    .scene-config {
+      display: none;
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      width: 260px;
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(12px);
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 1.25rem;
+      z-index: 200;
+      box-shadow: 0 8px 32px rgba(30,41,59,0.1);
+      font-size: 0.8rem;
+      color: #475569;
+    }
+
+    .scene-config.open { display: block; }
+
+    .scene-config h3 {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #1e293b;
+      margin-bottom: 0.75rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .scene-config h3 span {
+      font-size: 0.7rem;
+      color: #94a3b8;
+      font-weight: 400;
+    }
+
+    .cfg-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.6rem;
+    }
+
+    .cfg-row label {
+      font-size: 0.78rem;
+      color: #64748b;
+    }
+
+    .cfg-row input[type="range"] {
+      width: 110px;
+      accent-color: #6b9cf7;
+    }
+
+    .cfg-row input[type="checkbox"] {
+      accent-color: #6b9cf7;
+    }
+
+    .cfg-row .cfg-val {
+      font-size: 0.72rem;
+      color: #94a3b8;
+      min-width: 32px;
+      text-align: right;
     }
 
     /* ---- layout ---- */
     .app {
-      max-width: 680px;
+      max-width: 860px;
       margin: 0 auto;
       padding: 2.5rem 1.5rem 4rem;
+      position: relative;
+      z-index: 1;
     }
 
     .header {
       display: flex;
       align-items: center;
-      justify-content: space-between;
       margin-bottom: 2rem;
     }
 
-    .wordmark {
-      font-size: 0.9rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: #a1a1aa;
+    .logo {
+      font-size: 1.35rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: #1e293b;
       text-decoration: none;
     }
 
-    .saved-toggle {
-      display: none;
+    /* ---- search ---- */
+    .search-row {
+      display: flex;
       align-items: center;
-      gap: 0.4rem;
-      padding: 0.45rem 1rem;
-      font-size: 0.82rem;
-      font-weight: 500;
-      color: #a1a1aa;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 9999px;
-      cursor: pointer;
-      transition: background 0.15s;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
     }
 
-    .saved-toggle:hover { background: rgba(255,255,255,0.08); }
-    .saved-toggle.active { color: #c084fc; border-color: rgba(192,132,252,0.3); }
-
-    /* ---- search ---- */
     .search-wrap {
       position: relative;
-      margin-bottom: 1.5rem;
+      flex: 1;
     }
 
     .search-wrap svg {
       position: absolute;
-      left: 1rem;
+      left: 1.1rem;
       top: 50%;
       transform: translateY(-50%);
       width: 18px;
       height: 18px;
-      color: #52525b;
+      color: #94a3b8;
       pointer-events: none;
     }
 
     #searchInput {
       width: 100%;
-      padding: 0.85rem 1rem 0.85rem 2.8rem;
-      font-size: 1rem;
+      padding: 0.95rem 1rem 0.95rem 3rem;
+      font-size: 1.05rem;
       font-family: inherit;
-      color: #fafafa;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 12px;
+      color: #1e293b;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 16px;
       outline: none;
       transition: border-color 0.15s, box-shadow 0.15s;
     }
 
-    #searchInput::placeholder { color: #52525b; }
+    #searchInput::placeholder { color: #94a3b8; }
     #searchInput:focus {
-      border-color: rgba(129,140,248,0.5);
-      box-shadow: 0 0 0 3px rgba(129,140,248,0.1);
+      border-color: #93b5f7;
+      box-shadow: 0 0 0 3px rgba(147,181,247,0.25);
     }
 
-    /* ---- status ---- */
-    .status {
+    /* typing placeholder */
+    .search-wrap .typed-placeholder {
+      position: absolute;
+      left: 3rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.05rem;
+      color: #94a3b8;
+      pointer-events: none;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    .search-wrap .typed-placeholder .cursor {
+      display: inline-block;
+      width: 1px;
+      height: 1.1em;
+      background: #94a3b8;
+      vertical-align: text-bottom;
+      margin-left: 1px;
+      animation: blink 1s step-end infinite;
+    }
+
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+
+    /* info button */
+    .info-btn {
+      width: 42px;
+      height: 42px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 14px;
+      color: #64748b;
+      cursor: pointer;
+      font-size: 1.05rem;
+      font-weight: 600;
+      font-family: 'Georgia', serif;
+      font-style: italic;
+      transition: border-color 0.15s, color 0.15s, background 0.15s;
+    }
+
+    .info-btn:hover {
+      border-color: #93b5f7;
+      color: #475569;
+      background: #f0f5ff;
+    }
+
+    /* ---- info modal ---- */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(30,41,59,0.3);
+      backdrop-filter: blur(4px);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-overlay.open { display: flex; }
+
+    .modal {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 20px;
+      padding: 2rem;
+      max-width: 520px;
+      width: 90%;
+      position: relative;
+      animation: modalIn 0.2s ease-out;
+      box-shadow: 0 20px 60px rgba(30,41,59,0.12);
+    }
+
+    @keyframes modalIn {
+      from { opacity: 0; transform: scale(0.95) translateY(8px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      color: #64748b;
+      cursor: pointer;
+      font-size: 1.1rem;
+      transition: background 0.15s;
+    }
+
+    .modal-close:hover { background: #e2e8f0; }
+
+    .modal h2 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: #1e293b;
+    }
+
+    .modal ol {
+      padding-left: 1.3rem;
+      color: #64748b;
+      font-size: 0.9rem;
+      line-height: 1.8;
+    }
+
+    .modal ol li { margin-bottom: 0.4rem; }
+    .modal ol li strong { color: #1e293b; font-weight: 500; }
+
+    .modal p.hint {
+      margin-top: 1rem;
+      font-size: 0.82rem;
+      color: #94a3b8;
+      font-style: italic;
+    }
+
+    /* ---- results area ---- */
+    .results-area {
+      margin-top: 0.5rem;
+    }
+
+    .results-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+
+    .results-header .status {
       font-size: 0.85rem;
-      color: #71717a;
-      margin-bottom: 1.5rem;
+      color: #64748b;
       min-height: 1.3em;
     }
 
-    .status .spinner {
+    .results-header .status .spinner {
       display: inline-block;
       width: 12px;
       height: 12px;
-      border: 2px solid rgba(255,255,255,0.1);
-      border-top-color: #818cf8;
+      border: 2px solid #e2e8f0;
+      border-top-color: #6b9cf7;
       border-radius: 50%;
       animation: spin 0.6s linear infinite;
       vertical-align: middle;
@@ -113,116 +317,122 @@
 
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ---- cards ---- */
-    .cards { display: flex; flex-direction: column; gap: 1rem; }
-
-    .card {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.07);
-      border-radius: 14px;
-      padding: 1.5rem;
-      transition: border-color 0.2s;
+    .saved-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.45rem 1rem;
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: #64748b;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 9999px;
+      cursor: pointer;
+      transition: background 0.15s;
     }
 
-    .card:hover { border-color: rgba(255,255,255,0.12); }
+    .saved-toggle:hover { background: #f0f5ff; }
+    .saved-toggle.active { color: #7c6bc4; border-color: rgba(124,107,196,0.4); }
+
+    .saved-toggle svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    /* ---- cards ---- */
+    .cards { display: flex; flex-direction: column; gap: 0.75rem; }
+
+    .card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 18px;
+      padding: 1.25rem 1.5rem;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .card:hover {
+      border-color: #c7d7f5;
+      box-shadow: 0 4px 16px rgba(107,156,247,0.08);
+    }
 
     .card-top {
       display: flex;
       justify-content: space-between;
-      align-items: flex-start;
+      align-items: center;
       gap: 1rem;
-      margin-bottom: 0.75rem;
     }
 
     .card-name {
-      font-size: 1.1rem;
+      font-size: 1.05rem;
       font-weight: 600;
+      color: #1e293b;
     }
 
     .card-rating {
       flex-shrink: 0;
-      font-size: 0.82rem;
-      color: #a1a1aa;
+      font-size: 0.8rem;
+      color: #64748b;
       white-space: nowrap;
     }
 
-    .card-rating .star { color: #facc15; }
+    .card-rating .star { color: #f59e0b; }
 
     .card-meta {
-      font-size: 0.82rem;
-      color: #71717a;
-      line-height: 1.7;
+      font-size: 0.8rem;
+      color: #94a3b8;
+      margin-top: 0.3rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
     }
 
-    .card-meta a {
-      color: #818cf8;
-      text-decoration: none;
+    .card-meta .separator {
+      color: #cbd5e1;
     }
 
-    .card-meta a:hover { text-decoration: underline; }
-
-    .card-style {
-      display: inline-block;
-      margin-top: 0.6rem;
-      padding: 0.2rem 0.65rem;
-      font-size: 0.75rem;
-      font-weight: 500;
-      color: #c084fc;
-      background: rgba(192,132,252,0.1);
-      border-radius: 9999px;
-    }
-
-    .card-desc {
-      margin-top: 0.7rem;
-      font-size: 0.85rem;
-      color: #a1a1aa;
-      line-height: 1.55;
-      font-style: italic;
-    }
-
-    /* email draft area */
-    .draft-section {
-      margin-top: 1rem;
-      padding-top: 1rem;
-      border-top: 1px solid rgba(255,255,255,0.06);
-    }
-
-    .draft-label {
-      font-size: 0.75rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: #52525b;
-      margin-bottom: 0.5rem;
-    }
-
-    .draft-textarea {
-      width: 100%;
-      min-height: 120px;
-      padding: 0.75rem;
-      font-size: 0.82rem;
+    .copy-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.2rem 0.55rem;
+      font-size: 0.78rem;
       font-family: inherit;
-      line-height: 1.6;
-      color: #d4d4d8;
-      background: rgba(0,0,0,0.3);
-      border: 1px solid rgba(255,255,255,0.06);
+      color: #475569;
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
       border-radius: 8px;
-      resize: vertical;
-      outline: none;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+      white-space: nowrap;
     }
 
-    .draft-textarea:focus {
-      border-color: rgba(129,140,248,0.4);
+    .copy-chip:hover {
+      background: #e8eef6;
+      border-color: #c7d7f5;
+    }
+
+    .copy-chip.copied {
+      background: #d1fae5;
+      border-color: #a7f3d0;
+      color: #065f46;
+    }
+
+    .copy-chip svg {
+      width: 12px;
+      height: 12px;
+      flex-shrink: 0;
     }
 
     .call-instead {
-      margin-top: 0.75rem;
-      padding: 0.75rem;
-      font-size: 0.85rem;
-      background: rgba(250,204,21,0.06);
-      border: 1px solid rgba(250,204,21,0.12);
-      border-radius: 8px;
-      color: #facc15;
+      margin-top: 0.5rem;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.82rem;
+      background: #fef9e7;
+      border: 1px solid #fde68a;
+      border-radius: 12px;
+      color: #92400e;
     }
 
     /* card actions */
@@ -231,6 +441,7 @@
       display: flex;
       gap: 0.5rem;
       flex-wrap: wrap;
+      align-items: center;
     }
 
     .btn {
@@ -241,7 +452,7 @@
       font-size: 0.82rem;
       font-weight: 500;
       font-family: inherit;
-      border-radius: 8px;
+      border-radius: 12px;
       border: none;
       cursor: pointer;
       transition: background 0.15s, transform 0.1s;
@@ -250,23 +461,93 @@
     .btn:active { transform: scale(0.97); }
 
     .btn-primary {
-      background: #fafafa;
-      color: #09090b;
+      background: #6b9cf7;
+      color: #ffffff;
     }
 
-    .btn-primary:hover { background: #e4e4e7; }
+    .btn-primary:hover { background: #5a8be6; }
 
     .btn-ghost {
-      background: rgba(255,255,255,0.05);
-      color: #a1a1aa;
-      border: 1px solid rgba(255,255,255,0.08);
+      background: #f1f5f9;
+      color: #475569;
+      border: 1px solid #e2e8f0;
     }
 
-    .btn-ghost:hover { background: rgba(255,255,255,0.08); }
+    .btn-ghost:hover { background: #e8eef6; }
 
     .btn-copied {
-      background: rgba(74,222,128,0.15);
-      color: #4ade80;
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    /* ---- email hover popover ---- */
+    .email-popover-wrap {
+      position: relative;
+      display: inline-flex;
+    }
+
+    .email-popover {
+      display: none;
+      position: absolute;
+      bottom: calc(100% + 10px);
+      left: 50%;
+      transform: translateX(-50%);
+      width: 340px;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 1rem;
+      box-shadow: 0 12px 40px rgba(30,41,59,0.12);
+      z-index: 50;
+      animation: popIn 0.15s ease-out;
+    }
+
+    .email-popover::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 8px solid transparent;
+      border-top-color: #ffffff;
+    }
+
+    .email-popover::before {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 9px solid transparent;
+      border-top-color: #e2e8f0;
+    }
+
+    @keyframes popIn {
+      from { opacity: 0; transform: translateX(-50%) translateY(4px); }
+      to { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
+
+    .email-popover-wrap:hover .email-popover,
+    .email-popover-wrap.popover-active .email-popover {
+      display: block;
+    }
+
+    .email-popover-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #94a3b8;
+      margin-bottom: 0.5rem;
+    }
+
+    .email-popover-body {
+      font-size: 0.8rem;
+      line-height: 1.6;
+      color: #475569;
+      white-space: pre-wrap;
+      max-height: 200px;
+      overflow-y: auto;
     }
 
     /* building state */
@@ -279,8 +560,8 @@
       display: inline-block;
       width: 10px;
       height: 10px;
-      border: 2px solid rgba(255,255,255,0.1);
-      border-top-color: #818cf8;
+      border: 2px solid #e2e8f0;
+      border-top-color: #6b9cf7;
       border-radius: 50%;
       animation: spin 0.6s linear infinite;
       margin-left: 0.5rem;
@@ -291,21 +572,21 @@
     .saved-section {
       margin-top: 2rem;
       padding-top: 1.5rem;
-      border-top: 1px solid rgba(255,255,255,0.06);
+      border-top: 1px solid #e2e8f0;
     }
 
     .saved-section h3 {
       font-size: 0.85rem;
-      color: #52525b;
+      color: #94a3b8;
       font-weight: 500;
       margin-bottom: 1rem;
     }
 
     .card.saved {
-      opacity: 0.5;
+      opacity: 0.55;
     }
 
-    .card.saved:hover { opacity: 0.7; }
+    .card.saved:hover { opacity: 0.75; }
 
     /* fade in */
     @keyframes fadeIn {
@@ -317,24 +598,96 @@
   </style>
 </head>
 <body>
+  <canvas id="bg-canvas"></canvas>
+
+  <!-- 3D config panel (Ctrl+D) -->
+  <div class="scene-config" id="sceneConfig">
+    <h3>Scene Config <span>Ctrl+D</span></h3>
+    <div class="cfg-row">
+      <label>Show 3D</label>
+      <input type="checkbox" id="cfgShow" checked>
+    </div>
+    <div class="cfg-row">
+      <label>Rotation Speed</label>
+      <input type="range" id="cfgRotSpeed" min="0" max="100" value="5">
+      <span class="cfg-val" id="cfgRotSpeedVal">0.0005</span>
+    </div>
+    <div class="cfg-row">
+      <label>Camera Distance</label>
+      <input type="range" id="cfgCamDist" min="2" max="30" value="13">
+      <span class="cfg-val" id="cfgCamDistVal">13</span>
+    </div>
+    <div class="cfg-row">
+      <label>Camera Height</label>
+      <input type="range" id="cfgCamHeight" min="-10" max="20" value="5">
+      <span class="cfg-val" id="cfgCamHeightVal">5</span>
+    </div>
+    <div class="cfg-row">
+      <label>Model Scale</label>
+      <input type="range" id="cfgScale" min="1" max="100" value="20">
+      <span class="cfg-val" id="cfgScaleVal">2.0</span>
+    </div>
+    <div class="cfg-row">
+      <label>Light Intensity</label>
+      <input type="range" id="cfgLightInt" min="0" max="100" value="73">
+      <span class="cfg-val" id="cfgLightIntVal">2.2</span>
+    </div>
+    <div class="cfg-row">
+      <label>Opacity</label>
+      <input type="range" id="cfgOpacity" min="0" max="100" value="64">
+      <span class="cfg-val" id="cfgOpacityVal">0.64</span>
+    </div>
+  </div>
+
   <div class="app">
+    <!-- header: just text, no icon -->
     <div class="header">
-      <a href="/" class="wordmark">Platter</a>
-      <button class="saved-toggle" id="savedToggle">
-        Saved <span id="savedCount">0</span>
-      </button>
+      <a href="/" class="logo">Platter</a>
     </div>
 
-    <div class="search-wrap">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg>
-      <input type="text" id="searchInput" placeholder="nail salons in San Francisco" autofocus>
+    <!-- search row with info button -->
+    <div class="search-row">
+      <div class="search-wrap">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg>
+        <input type="text" id="searchInput" placeholder="" autofocus>
+        <div class="typed-placeholder" id="typedPlaceholder"><span id="typedText"></span><span class="cursor"></span></div>
+      </div>
+      <button class="info-btn" id="infoBtn" title="How to use Platter">i</button>
     </div>
 
-    <div class="status" id="status"></div>
-    <div class="cards" id="cards"></div>
-    <div class="saved-section" id="savedSection" style="display:none;">
-      <h3>Saved for Later</h3>
-      <div class="cards" id="savedCards"></div>
+    <!-- info modal -->
+    <div class="modal-overlay" id="infoModal">
+      <div class="modal">
+        <button class="modal-close" id="modalClose">&times;</button>
+        <h2>How to use Platter</h2>
+        <ol>
+          <li><strong>Search</strong> for a type of business and location (e.g. "bakeries in Oakland")</li>
+          <li>Platter finds businesses that <strong>don't have a website</strong> yet</li>
+          <li>We <strong>auto-generate a website</strong> for each one and draft an outreach email</li>
+          <li><strong>Copy the email</strong> and send it to the business owner</li>
+          <li>Use <strong>Save for Later</strong> to bookmark businesses you want to follow up on</li>
+        </ol>
+        <p class="hint">Tip: Be specific with your search to get the best results.</p>
+      </div>
+    </div>
+
+    <!-- results area with saved toggle -->
+    <div class="results-area">
+      <div class="results-header">
+        <div class="status" id="status"></div>
+        <button class="saved-toggle" id="savedToggle">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z"/></svg>
+          <span id="savedToggleLabel">Show Saved</span>
+          <span id="savedCount">0</span>
+        </button>
+      </div>
+
+      <div class="cards" id="cards"></div>
+
+      <div class="saved-section" id="savedSection" style="display:none;">
+        <h3>Saved for Later</h3>
+        <div class="cards" id="savedCards"></div>
+      </div>
     </div>
   </div>
 
@@ -346,12 +699,87 @@
     const savedCardsEl = document.getElementById('savedCards');
     const savedToggle = document.getElementById('savedToggle');
     const savedCountEl = document.getElementById('savedCount');
+    const savedToggleLabel = document.getElementById('savedToggleLabel');
+    const infoBtn = document.getElementById('infoBtn');
+    const infoModal = document.getElementById('infoModal');
+    const modalClose = document.getElementById('modalClose');
+    const typedPlaceholder = document.getElementById('typedPlaceholder');
+    const typedText = document.getElementById('typedText');
 
     let debounceTimer;
     let currentSearchId = null;
     let pollTimer = null;
     let savedVisible = false;
     let savedItems = [];
+
+    // ---- typing placeholder animation ----
+    const placeholderExamples = [
+      'nail salons in San Francisco',
+      'taquerias in the Mission District',
+      'barber shops in Oakland',
+      'yoga studios in Berkeley',
+      'auto repair in San Jose',
+      'bakeries in Palo Alto',
+      'pet groomers in Fremont',
+      'flower shops in Walnut Creek',
+      'tattoo parlors in San Mateo',
+      'coffee roasters in Santa Cruz',
+    ];
+
+    let exampleIndex = 0;
+    let charIndex = 0;
+    let isDeleting = false;
+    let typeTimer = null;
+
+    function typeLoop() {
+      // hide when user is typing
+      if (searchInput.value.length > 0) {
+        typedPlaceholder.style.display = 'none';
+        typeTimer = setTimeout(typeLoop, 300);
+        return;
+      }
+      typedPlaceholder.style.display = '';
+
+      const current = placeholderExamples[exampleIndex];
+
+      if (!isDeleting) {
+        charIndex++;
+        typedText.textContent = current.slice(0, charIndex);
+        if (charIndex >= current.length) {
+          // pause at full text
+          typeTimer = setTimeout(() => { isDeleting = true; typeLoop(); }, 2000);
+          return;
+        }
+        typeTimer = setTimeout(typeLoop, 60 + Math.random() * 40);
+      } else {
+        charIndex--;
+        typedText.textContent = current.slice(0, charIndex);
+        if (charIndex <= 0) {
+          isDeleting = false;
+          exampleIndex = (exampleIndex + 1) % placeholderExamples.length;
+          typeTimer = setTimeout(typeLoop, 400);
+          return;
+        }
+        typeTimer = setTimeout(typeLoop, 30);
+      }
+    }
+
+    typeLoop();
+
+    // hide placeholder on focus if empty (cursor still shows)
+    searchInput.addEventListener('input', () => {
+      typedPlaceholder.style.display = searchInput.value.length > 0 ? 'none' : '';
+    });
+
+    // ---- info modal ----
+    infoBtn.addEventListener('click', () => { infoModal.classList.add('open'); });
+    modalClose.addEventListener('click', () => { infoModal.classList.remove('open'); });
+    infoModal.addEventListener('click', (e) => {
+      if (e.target === infoModal) infoModal.classList.remove('open');
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') infoModal.classList.remove('open');
+    });
 
     // --- search triggers ---
     searchInput.addEventListener('input', () => {
@@ -374,8 +802,55 @@
     savedToggle.addEventListener('click', () => {
       savedVisible = !savedVisible;
       savedToggle.classList.toggle('active', savedVisible);
+      savedToggleLabel.textContent = savedVisible ? 'Hide Saved' : 'Show Saved';
       savedSection.style.display = savedVisible ? 'block' : 'none';
     });
+
+    // --- mock data for UI preview ---
+    const mockBusinesses = [
+      {
+        id: 'mock-1',
+        name: 'Sunrise Nails & Spa',
+        google_rating: 4.7,
+        google_reviews: 238,
+        address: '1842 Irving St, San Francisco, CA 94122',
+        phone: '(415) 555-0142',
+        email: 'sunrise.nails.sf@gmail.com',
+        live_url: 'https://sunrisenailssf.platter.site',
+        style: 'Elegant & Calm',
+        description: 'A neighborhood gem known for their meticulous gel work and relaxing atmosphere. Loyal clientele of 10+ years.',
+      },
+      {
+        id: 'mock-2',
+        name: 'Golden Gate Auto Repair',
+        google_rating: 4.9,
+        google_reviews: 412,
+        address: '750 Bay Shore Blvd, San Francisco, CA 94124',
+        phone: '(415) 555-0387',
+        email: null,
+        live_url: 'https://goldengateauto.platter.site',
+        style: 'Bold & Trustworthy',
+        description: 'Family-owned since 1998. Specializes in European imports. The go-to shop on Yelp for honest pricing.',
+      },
+      {
+        id: 'mock-3',
+        name: 'Masa\'s Taqueria',
+        google_rating: 4.5,
+        google_reviews: 189,
+        address: '2987 24th St, San Francisco, CA 94110',
+        phone: '(415) 555-0219',
+        email: 'masataqueria@gmail.com',
+        live_url: 'https://masastaqueria.platter.site',
+        style: 'Vibrant & Warm',
+        description: 'Beloved Mission District taqueria famous for their al pastor and house-made horchata. Cash only, always a line.',
+      },
+    ];
+
+    // render mock cards on load
+    statusEl.textContent = `${mockBusinesses.length} businesses found.`;
+    for (const biz of mockBusinesses) {
+      renderCard(biz, cardsEl, false);
+    }
 
     // --- search flow ---
     async function startSearch(query) {
@@ -451,20 +926,15 @@
       const hasEmail = biz.email && biz.email !== 'null';
       const liveUrl = biz.live_url || '';
 
-      let draftSection = '';
-      if (hasEmail && liveUrl) {
-        const draft = `Subject: We built you a free website\n\nHi ${biz.name},\n\nWe noticed you didn't have a website so we built one for you — take a look:\n${liveUrl}\n\nHappy to chat if you have questions.\n— Platter`;
-        draftSection = `
-          <div class="draft-section">
-            <div class="draft-label">Email draft</div>
-            <textarea class="draft-textarea" data-draft>${draft}</textarea>
-          </div>`;
-      } else if (!hasEmail && biz.phone) {
-        draftSection = `
-          <div class="draft-section">
-            <div class="call-instead">Call instead: ${biz.phone}</div>
-          </div>`;
-      }
+      // Build condensed address: just city-level
+      const addressShort = biz.address ? esc(biz.address) : '';
+
+      // Email draft text (hidden, used for popover)
+      const draft = hasEmail && liveUrl
+        ? `Subject: We built you a free website\n\nHi ${biz.name},\n\nWe noticed you didn't have a website so we built one for you — take a look:\n${liveUrl}\n\nHappy to chat if you have questions.\n— Platter`
+        : '';
+
+      const copyIcon = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 011.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 00-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 01-1.125-1.125v-9.25m0 0a9.06 9.06 0 011.5-.124H15a3.75 3.75 0 013.75 3.75v5.624"/></svg>`;
 
       card.innerHTML = `
         <div class="card-top">
@@ -472,39 +942,62 @@
           ${biz.google_rating ? `<div class="card-rating"><span class="star">&#9733;</span> ${biz.google_rating} (${biz.google_reviews})</div>` : ''}
         </div>
         <div class="card-meta">
-          ${biz.address ? `${esc(biz.address)}<br>` : ''}
-          ${biz.phone ? `${esc(biz.phone)}<br>` : ''}
-          ${hasEmail ? `${esc(biz.email)}<br>` : '<span style="color:#52525b">Email not found</span><br>'}
-          ${liveUrl ? `<a href="${esc(liveUrl)}" target="_blank">${esc(liveUrl)}</a>` : ''}
+          ${addressShort ? `<span>${addressShort}</span>` : ''}
         </div>
-        ${biz.style ? `<span class="card-style">${esc(biz.style)}</span>` : ''}
-        ${biz.description ? `<div class="card-desc">"${esc(biz.description)}"</div>` : ''}
-        ${draftSection}
+        <div class="card-meta" style="margin-top:0.4rem;">
+          ${hasEmail ? `<button class="copy-chip" data-copy-contact="${esc(biz.email)}">${copyIcon} ${esc(biz.email)}</button>` : '<span style="color:#94a3b8">No email found</span>'}
+          ${biz.phone ? `<button class="copy-chip" data-copy-contact="${esc(biz.phone)}">${copyIcon} ${esc(biz.phone)}</button>` : ''}
+        </div>
         <div class="card-actions">
-          ${hasEmail && liveUrl ? `<button class="btn btn-primary" data-copy>Copy Email</button>` : ''}
+          ${liveUrl ? `<a href="${esc(liveUrl)}" target="_blank" class="btn btn-ghost" style="text-decoration:none;">Preview</a>` : ''}
+          ${hasEmail && liveUrl ? `
+            <div class="email-popover-wrap">
+              <button class="btn btn-primary" data-copy>Copy Email Draft</button>
+              <div class="email-popover">
+                <div class="email-popover-label">Email Draft</div>
+                <div class="email-popover-body">${esc(draft)}</div>
+              </div>
+            </div>
+          ` : ''}
           ${!isSaved ? `<button class="btn btn-ghost" data-save>Save for Later</button>` : ''}
         </div>
       `;
+
+      // store draft text for copying
+      card._draft = draft;
 
       // copy email
       const copyBtn = card.querySelector('[data-copy]');
       if (copyBtn) {
         copyBtn.addEventListener('click', () => {
-          const textarea = card.querySelector('[data-draft]');
-          if (textarea) {
-            navigator.clipboard.writeText(textarea.value).then(() => {
-              copyBtn.textContent = 'Copied!';
-              copyBtn.classList.add('btn-copied');
-              copyBtn.classList.remove('btn-primary');
-              setTimeout(() => {
-                copyBtn.textContent = 'Copy Email';
-                copyBtn.classList.remove('btn-copied');
-                copyBtn.classList.add('btn-primary');
-              }, 2000);
-            });
-          }
+          navigator.clipboard.writeText(card._draft).then(() => {
+            copyBtn.textContent = 'Copied!';
+            copyBtn.classList.add('btn-copied');
+            copyBtn.classList.remove('btn-primary');
+            setTimeout(() => {
+              copyBtn.textContent = 'Copy Email';
+              copyBtn.classList.remove('btn-copied');
+              copyBtn.classList.add('btn-primary');
+            }, 2000);
+          });
         });
       }
+
+      // copy contact chips (email / phone)
+      card.querySelectorAll('[data-copy-contact]').forEach(chip => {
+        chip.addEventListener('click', () => {
+          const val = chip.getAttribute('data-copy-contact');
+          navigator.clipboard.writeText(val).then(() => {
+            const orig = chip.innerHTML;
+            chip.textContent = 'Copied!';
+            chip.classList.add('copied');
+            setTimeout(() => {
+              chip.innerHTML = orig;
+              chip.classList.remove('copied');
+            }, 1500);
+          });
+        });
+      });
 
       // save for later
       const saveBtn = card.querySelector('[data-save]');
@@ -532,7 +1025,6 @@
 
     function updateSavedBadge() {
       savedCountEl.textContent = savedItems.length;
-      savedToggle.style.display = savedItems.length > 0 ? 'inline-flex' : 'none';
     }
 
     function esc(str) {
@@ -540,6 +1032,174 @@
       d.textContent = str || '';
       return d.innerHTML;
     }
+  </script>
+
+  <!-- Three.js 3D background -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.163.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.163.0/examples/jsm/"
+    }
+  }
+  </script>
+  <script type="module">
+    import * as THREE from 'three';
+    import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+    const canvas = document.getElementById('bg-canvas');
+    const configPanel = document.getElementById('sceneConfig');
+
+    // --- config state ---
+    const cfg = {
+      show: true,
+      rotSpeed: 0.0005,
+      camDist: 13,
+      camHeight: 5,
+      scale: 2.0,
+      lightIntensity: 2.2,
+      opacity: 0.64,
+    };
+
+    // --- Three.js setup ---
+    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.2;
+
+    const scene = new THREE.Scene();
+
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+    camera.position.set(0, cfg.camHeight, cfg.camDist);
+    camera.lookAt(0, 0, 0);
+
+    // --- warm lighting ---
+    const ambient = new THREE.AmbientLight(0xfff0e0, 0.6);
+    scene.add(ambient);
+
+    // warm key light (sun-like)
+    const keyLight = new THREE.DirectionalLight(0xffe4b5, cfg.lightIntensity);
+    keyLight.position.set(5, 8, 4);
+    keyLight.castShadow = false;
+    scene.add(keyLight);
+
+    // warm fill light
+    const fillLight = new THREE.DirectionalLight(0xffd4a0, 0.5);
+    fillLight.position.set(-4, 3, -2);
+    scene.add(fillLight);
+
+    // soft warm rim
+    const rimLight = new THREE.PointLight(0xffb870, 0.4, 30);
+    rimLight.position.set(0, 6, -6);
+    scene.add(rimLight);
+
+    // --- load model ---
+    let model = null;
+    const loader = new GLTFLoader();
+    loader.load('/models/low_poly_nature.glb', (gltf) => {
+      model = gltf.scene;
+      model.scale.setScalar(cfg.scale);
+
+      // center model
+      const box = new THREE.Box3().setFromObject(model);
+      const center = box.getCenter(new THREE.Vector3());
+      model.position.sub(center);
+      model.position.y -= 1;
+
+      scene.add(model);
+    });
+
+    // --- animation loop ---
+    function animate() {
+      requestAnimationFrame(animate);
+
+      if (!cfg.show) {
+        canvas.style.opacity = '0';
+        return;
+      }
+
+      canvas.style.opacity = String(cfg.opacity);
+
+      if (model) {
+        model.rotation.y += cfg.rotSpeed;
+      }
+
+      camera.position.set(0, cfg.camHeight, cfg.camDist);
+      camera.lookAt(0, 0, 0);
+
+      keyLight.intensity = cfg.lightIntensity;
+
+      renderer.render(scene, camera);
+    }
+
+    animate();
+
+    // --- resize ---
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // --- config panel toggle (Ctrl+D) ---
+    document.addEventListener('keydown', (e) => {
+      if (e.ctrlKey && e.key === 'd') {
+        e.preventDefault();
+        configPanel.classList.toggle('open');
+      }
+    });
+
+    // --- config controls ---
+    const cfgShow = document.getElementById('cfgShow');
+    const cfgRotSpeed = document.getElementById('cfgRotSpeed');
+    const cfgRotSpeedVal = document.getElementById('cfgRotSpeedVal');
+    const cfgCamDist = document.getElementById('cfgCamDist');
+    const cfgCamDistVal = document.getElementById('cfgCamDistVal');
+    const cfgCamHeight = document.getElementById('cfgCamHeight');
+    const cfgCamHeightVal = document.getElementById('cfgCamHeightVal');
+    const cfgScale = document.getElementById('cfgScale');
+    const cfgScaleVal = document.getElementById('cfgScaleVal');
+    const cfgLightInt = document.getElementById('cfgLightInt');
+    const cfgLightIntVal = document.getElementById('cfgLightIntVal');
+    const cfgOpacity = document.getElementById('cfgOpacity');
+    const cfgOpacityVal = document.getElementById('cfgOpacityVal');
+
+    cfgShow.addEventListener('change', () => {
+      cfg.show = cfgShow.checked;
+    });
+
+    cfgRotSpeed.addEventListener('input', () => {
+      cfg.rotSpeed = cfgRotSpeed.value / 10000;
+      cfgRotSpeedVal.textContent = cfg.rotSpeed.toFixed(4);
+    });
+
+    cfgCamDist.addEventListener('input', () => {
+      cfg.camDist = Number(cfgCamDist.value);
+      cfgCamDistVal.textContent = cfg.camDist;
+    });
+
+    cfgCamHeight.addEventListener('input', () => {
+      cfg.camHeight = Number(cfgCamHeight.value);
+      cfgCamHeightVal.textContent = cfg.camHeight;
+    });
+
+    cfgScale.addEventListener('input', () => {
+      cfg.scale = cfgScale.value / 10;
+      cfgScaleVal.textContent = cfg.scale.toFixed(1);
+      if (model) model.scale.setScalar(cfg.scale);
+    });
+
+    cfgLightInt.addEventListener('input', () => {
+      cfg.lightIntensity = cfgLightInt.value / 33.3;
+      cfgLightIntVal.textContent = cfg.lightIntensity.toFixed(1);
+    });
+
+    cfgOpacity.addEventListener('input', () => {
+      cfg.opacity = cfgOpacity.value / 100;
+      cfgOpacityVal.textContent = cfg.opacity.toFixed(2);
+    });
   </script>
 </body>
 </html>

@@ -1,187 +1,613 @@
-<!-- --- DEV B owns this file --- -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Platter — Websites for Local Businesses</title>
+  <title>Platter</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { overflow: hidden; background: #87CEEB; font-family: system-ui, sans-serif; }
+    canvas { display: block; }
 
-    body {
-      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    /* Loading screen */
+    #loading {
+      position: fixed; inset: 0; z-index: 100;
       background: #09090b;
-      color: #fafafa;
-      min-height: 100vh;
-      overflow-x: hidden;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      transition: opacity 0.6s ease;
     }
+    #loading.fade-out { opacity: 0; pointer-events: none; }
+    #loading h1 {
+      font-size: 3rem; color: #fafafa; letter-spacing: 0.08em; margin-bottom: 2rem;
+    }
+    #progress-bar-bg {
+      width: 280px; height: 6px; background: #27272a; border-radius: 3px; overflow: hidden;
+    }
+    #progress-bar-fill {
+      width: 0%; height: 100%; background: #818cf8; border-radius: 3px;
+      transition: width 0.3s ease;
+    }
+    #loading p { color: #71717a; margin-top: 1rem; font-size: 0.85rem; }
 
-    .landing {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      padding: 2rem;
-      position: relative;
+    /* Debug panel */
+    #debug {
+      display: none; position: fixed; top: 10px; right: 10px; z-index: 50;
+      background: rgba(0,0,0,0.85); color: #eee; padding: 14px 18px;
+      border-radius: 10px; font-size: 12px; max-height: 90vh; overflow-y: auto;
+      width: 300px; backdrop-filter: blur(6px);
     }
-
-    /* subtle radial glow */
-    .landing::before {
-      content: '';
-      position: absolute;
-      top: -20%;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 800px;
-      height: 800px;
-      background: radial-gradient(circle, rgba(99,102,241,0.12) 0%, transparent 70%);
-      pointer-events: none;
+    #debug h3 { margin: 10px 0 6px; color: #818cf8; font-size: 13px; }
+    #debug h3:first-child { margin-top: 0; }
+    #debug label { display: flex; align-items: center; gap: 6px; margin: 3px 0; }
+    #debug label span { width: 50px; flex-shrink: 0; }
+    #debug input[type=range] { flex: 1; accent-color: #818cf8; }
+    #debug .val { width: 42px; text-align: right; color: #a1a1aa; flex-shrink: 0; }
+    #debug button {
+      margin-top: 10px; padding: 6px 14px; background: #818cf8; color: #fff;
+      border: none; border-radius: 6px; cursor: pointer; font-size: 12px; width: 100%;
     }
-
-    .logo {
-      font-size: 1rem;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: #a1a1aa;
-      margin-bottom: 3rem;
-    }
-
-    h1 {
-      font-size: clamp(2.5rem, 6vw, 4.5rem);
-      font-weight: 700;
-      text-align: center;
-      line-height: 1.1;
-      max-width: 700px;
-      letter-spacing: -0.03em;
-    }
-
-    h1 span {
-      background: linear-gradient(135deg, #818cf8, #c084fc);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .subtitle {
-      margin-top: 1.5rem;
-      font-size: 1.15rem;
-      color: #a1a1aa;
-      text-align: center;
-      max-width: 480px;
-      line-height: 1.6;
-    }
-
-    .cta {
-      margin-top: 3rem;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.9rem 2rem;
-      background: #fafafa;
-      color: #09090b;
-      font-size: 1rem;
-      font-weight: 600;
-      border: none;
-      border-radius: 9999px;
-      cursor: pointer;
-      text-decoration: none;
-      transition: transform 0.15s, box-shadow 0.15s;
-    }
-
-    .cta:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 0 30px rgba(129,140,248,0.3);
-    }
-
-    .cta svg {
-      width: 18px;
-      height: 18px;
-      transition: transform 0.15s;
-    }
-
-    .cta:hover svg {
-      transform: translateX(3px);
-    }
-
-    .features {
-      margin-top: 5rem;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1.5rem;
-      max-width: 720px;
-      width: 100%;
-    }
-
-    @media (max-width: 640px) {
-      .features { grid-template-columns: 1fr; }
-    }
-
-    .feature {
-      padding: 1.5rem;
-      border-radius: 12px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.06);
-    }
-
-    .feature-icon {
-      font-size: 1.4rem;
-      margin-bottom: 0.75rem;
-    }
-
-    .feature h3 {
-      font-size: 0.95rem;
-      font-weight: 600;
-      margin-bottom: 0.4rem;
-    }
-
-    .feature p {
-      font-size: 0.82rem;
-      color: #71717a;
-      line-height: 1.5;
-    }
-
-    .footer {
-      margin-top: 5rem;
-      padding-bottom: 2rem;
-      font-size: 0.8rem;
-      color: #3f3f46;
-    }
+    #debug button:hover { background: #6366f1; }
   </style>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.168.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.168.0/examples/jsm/"
+    }
+  }
+  </script>
 </head>
 <body>
-  <div class="landing">
-    <div class="logo">Platter</div>
 
-    <h1>We build websites for <span>local businesses</span></h1>
+<div id="loading">
+  <h1>Platter</h1>
+  <div id="progress-bar-bg"><div id="progress-bar-fill"></div></div>
+  <p>Loading scene...</p>
+</div>
 
-    <p class="subtitle">
-      Find businesses without a web presence, generate a custom landing page, and deploy it — all in one search.
-    </p>
+<div id="debug"></div>
 
-    <a href="/app.html" class="cta">
-      Get started
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>
-    </a>
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { FontLoader } from 'three/addons/loaders/FontLoader.js';
+import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 
-    <div class="features">
-      <div class="feature">
-        <div class="feature-icon">1</div>
-        <h3>Search</h3>
-        <p>Type a category and city. We find businesses with no website.</p>
-      </div>
-      <div class="feature">
-        <div class="feature-icon">2</div>
-        <h3>Generate</h3>
-        <p>A custom landing page is built and deployed automatically.</p>
-      </div>
-      <div class="feature">
-        <div class="feature-icon">3</div>
-        <h3>Reach out</h3>
-        <p>Copy the pre-written email or call the business directly.</p>
-      </div>
-    </div>
+// ───── Config (editable via debug panel) ─────
+const config = {
+  trucks: [
+    { name: 'Ice Cream Truck', file: 'ice_cream_truck.glb', img: 'icecream.png', posX: -6.8, posY: 3.1, posZ: 3.6, rotY: -2.54, scale: 2.91 },
+    { name: 'Pizza Truck', file: 'pizza_food_vendor_truck.glb', img: 'pizza_ed.png', posX: -0.1, posY: -0.1, posZ: -6.6, rotY: 0.01, scale: 3.61 },
+    { name: 'Pokemon Center', file: 'mobile_pokemon_center.glb', img: 'pokemon.png', posX: 8.2, posY: -0.1, posZ: 0.1, rotY: 1.81, scale: 2.21 },
+  ],
+  button: { posX: 0, posY: 0.3, posZ: 7.3, scale: 3 },
+  groundText: { posX: 0.3, posZ: 0.8, scale: 3 },
+  subtitle: { posX: 0.2, posZ: 4.1, scale: 2 },
+  screens: [
+    { offsetX: -8.3, offsetY: 5.8, offsetZ: -2.9, rotY: -2.59, scale: 4.6, width: 4, height: 3 },
+    { offsetX: 0, offsetY: 9.4, offsetZ: -5.6, rotY: 0, scale: 4.7, width: 4, height: 3 },
+    { offsetX: 7.6, offsetY: 8.6, offsetZ: 0.5, rotY: -2.89, scale: 4.3, width: 4, height: 3 },
+  ],
+  camera: { posX: -0.5, posY: 16.3, posZ: 21.3, targetX: 0, targetY: 3.6, targetZ: 0 },
+};
 
-    <div class="footer">Platter &mdash; 2026</div>
-  </div>
+// ───── Renderer ─────
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.8;
+document.body.appendChild(renderer.domElement);
+
+// ───── Scene ─────
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x87CEEB);
+scene.fog = new THREE.Fog(0x87CEEB, 30, 80);
+
+// ───── Camera ─────
+const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 200);
+camera.position.set(config.camera.posX, config.camera.posY, config.camera.posZ);
+
+// ───── Controls ─────
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.08;
+controls.target.set(config.camera.targetX, config.camera.targetY, config.camera.targetZ);
+controls.minDistance = 5;
+controls.maxDistance = 30;
+
+// ───── Lighting ─────
+const ambientLight = new THREE.AmbientLight(0xffffff, 1.2);
+scene.add(ambientLight);
+
+const hemiLight = new THREE.HemisphereLight(0x87CEEB, 0x556B2F, 0.8);
+scene.add(hemiLight);
+
+const sunLight = new THREE.DirectionalLight(0xffffff, 2.0);
+sunLight.position.set(8, 15, 10);
+sunLight.castShadow = true;
+sunLight.shadow.mapSize.set(2048, 2048);
+sunLight.shadow.camera.left = -20;
+sunLight.shadow.camera.right = 20;
+sunLight.shadow.camera.top = 20;
+sunLight.shadow.camera.bottom = -20;
+sunLight.shadow.camera.near = 0.5;
+sunLight.shadow.camera.far = 50;
+sunLight.shadow.bias = -0.001;
+scene.add(sunLight);
+
+// ───── Ground ─────
+const groundCanvas = document.createElement('canvas');
+groundCanvas.width = 512;
+groundCanvas.height = 512;
+const gCtx = groundCanvas.getContext('2d');
+gCtx.fillStyle = '#f5f5f5';
+gCtx.fillRect(0, 0, 512, 512);
+// subtle noise
+for (let i = 0; i < 40000; i++) {
+  const x = Math.random() * 512;
+  const y = Math.random() * 512;
+  const v = 230 + Math.random() * 25;
+  gCtx.fillStyle = `rgb(${v},${v},${v})`;
+  gCtx.fillRect(x, y, 1.5, 1.5);
+}
+const groundTex = new THREE.CanvasTexture(groundCanvas);
+groundTex.wrapS = groundTex.wrapT = THREE.RepeatWrapping;
+groundTex.repeat.set(8, 8);
+
+const groundGeom = new THREE.PlaneGeometry(100, 100);
+const groundMat = new THREE.MeshStandardMaterial({ map: groundTex, roughness: 0.9 });
+const ground = new THREE.Mesh(groundGeom, groundMat);
+ground.rotation.x = -Math.PI / 2;
+ground.receiveShadow = true;
+scene.add(ground);
+
+// ───── 3D Text (title + subtitle) ─────
+let groundTextMesh, subtitleMesh;
+const textMat3D = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.3, metalness: 0.4 });
+const subMat3D = new THREE.MeshStandardMaterial({ color: 0x222222, roughness: 0.4, metalness: 0.3 });
+
+const fontLoader = new FontLoader();
+fontLoader.load('https://cdn.jsdelivr.net/npm/three@0.168.0/examples/fonts/helvetiker_bold.typeface.json', (font) => {
+  // Title: "Platter"
+  const titleGeom = new TextGeometry('Platter', {
+    font,
+    size: 1,
+    depth: 0.15,
+    curveSegments: 12,
+    bevelEnabled: true,
+    bevelThickness: 0.03,
+    bevelSize: 0.02,
+    bevelSegments: 5,
+  });
+  titleGeom.computeBoundingBox();
+  titleGeom.center();
+  groundTextMesh = new THREE.Mesh(titleGeom, textMat3D);
+  groundTextMesh.castShadow = true;
+  groundTextMesh.receiveShadow = true;
+  groundTextMesh.position.set(config.groundText.posX, 0.01, config.groundText.posZ);
+  groundTextMesh.rotation.x = -Math.PI / 2;
+  groundTextMesh.scale.setScalar(config.groundText.scale);
+  scene.add(groundTextMesh);
+
+  // Subtitle: "deliver websites in seconds"
+  const subGeom = new TextGeometry('deliver websites in seconds', {
+    font,
+    size: 0.4,
+    depth: 0.1,
+    curveSegments: 8,
+    bevelEnabled: true,
+    bevelThickness: 0.01,
+    bevelSize: 0.008,
+    bevelSegments: 3,
+  });
+  subGeom.computeBoundingBox();
+  subGeom.center();
+  subtitleMesh = new THREE.Mesh(subGeom, subMat3D);
+  subtitleMesh.castShadow = true;
+  subtitleMesh.receiveShadow = true;
+  subtitleMesh.position.set(config.subtitle.posX, 0.01, config.subtitle.posZ);
+  subtitleMesh.rotation.x = -Math.PI / 2;
+  subtitleMesh.scale.setScalar(config.subtitle.scale);
+  scene.add(subtitleMesh);
+});
+
+// ───── 3D "Start Cooking" button ─────
+// Rounded base
+const btnShape = createRoundedRectShape(3, 0.8, 0.2);
+const btnBaseGeom = new THREE.ExtrudeGeometry(btnShape, { depth: 0.3, bevelEnabled: false });
+const btnBaseMat = new THREE.MeshStandardMaterial({ color: 0xa78bfa, roughness: 0.3, metalness: 0.2 });
+const btnBaseMesh = new THREE.Mesh(btnBaseGeom, btnBaseMat);
+btnBaseMesh.castShadow = true;
+btnBaseMesh.receiveShadow = true;
+
+const btnGroup = new THREE.Group();
+btnGroup.add(btnBaseMesh);
+
+// 3D text on top (added once font loads)
+fontLoader.load('https://cdn.jsdelivr.net/npm/three@0.168.0/examples/fonts/helvetiker_bold.typeface.json', (font) => {
+  const btnTextGeom = new TextGeometry('Start Cooking', {
+    font,
+    size: 0.22,
+    depth: 0.06,
+    curveSegments: 8,
+    bevelEnabled: true,
+    bevelThickness: 0.005,
+    bevelSize: 0.004,
+    bevelSegments: 3,
+  });
+  btnTextGeom.computeBoundingBox();
+  btnTextGeom.center();
+  const btnTextMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.2, metalness: 0.1 });
+  const btnTextMesh = new THREE.Mesh(btnTextGeom, btnTextMat);
+  btnTextMesh.position.z = 0.3 + 0.01; // sit on top of base
+  btnGroup.add(btnTextMesh);
+});
+
+// Rotate group so it lies flat (face up)
+btnGroup.rotation.x = -Math.PI / 2;
+const btnMesh = btnGroup;
+btnMesh.position.set(config.button.posX, config.button.posY, config.button.posZ);
+btnMesh.scale.setScalar(config.button.scale);
+btnMesh.castShadow = true;
+btnMesh.receiveShadow = true;
+scene.add(btnMesh);
+
+// ───── Raycaster for button interaction ─────
+const raycaster = new THREE.Raycaster();
+const pointer = new THREE.Vector2();
+let isHovering = false;
+const btnBaseY = config.button.posY;
+
+renderer.domElement.addEventListener('pointermove', (e) => {
+  pointer.x = (e.clientX / window.innerWidth) * 2 - 1;
+  pointer.y = -(e.clientY / window.innerHeight) * 2 + 1;
+});
+
+renderer.domElement.addEventListener('click', () => {
+  if (isHovering) {
+    window.location.href = '/app.html';
+  }
+});
+
+// ───── Load food trucks ─────
+const loader = new GLTFLoader();
+const truckMeshes = [];
+let modelsLoaded = 0;
+const totalModels = config.trucks.length;
+
+function updateProgress() {
+  const pct = Math.round((modelsLoaded / totalModels) * 100);
+  document.getElementById('progress-bar-fill').style.width = pct + '%';
+  if (modelsLoaded === totalModels) {
+    setTimeout(() => {
+      const el = document.getElementById('loading');
+      el.classList.add('fade-out');
+      setTimeout(() => el.style.display = 'none', 600);
+    }, 300);
+  }
+}
+
+const TARGET_SIZE = 3; // normalize all models to ~3 units tall
+const baseScales = []; // store computed base scale per model
+
+config.trucks.forEach((t, i) => {
+  loader.load(`/models/${t.file}`, (gltf) => {
+    const model = gltf.scene;
+
+    // Compute bounding box to find native size
+    const box = new THREE.Box3().setFromObject(model);
+    const size = new THREE.Vector3();
+    box.getSize(size);
+    const maxDim = Math.max(size.x, size.y, size.z);
+    const normalizeScale = TARGET_SIZE / maxDim;
+    baseScales[i] = normalizeScale;
+
+    // Center the model's geometry on its origin
+    const center = new THREE.Vector3();
+    box.getCenter(center);
+    model.position.sub(center.multiplyScalar(normalizeScale));
+
+    // Apply normalized scale * user config scale
+    model.scale.setScalar(normalizeScale * t.scale);
+    model.position.set(t.posX, t.posY, t.posZ);
+    model.rotation.y = t.rotY;
+
+    model.traverse((child) => {
+      if (child.isMesh) {
+        child.castShadow = true;
+        child.receiveShadow = true;
+      }
+    });
+    scene.add(model);
+    truckMeshes[i] = model;
+    modelsLoaded++;
+    updateProgress();
+    console.log(`${t.name}: native max=${maxDim.toFixed(2)}, baseScale=${normalizeScale.toFixed(4)}`);
+  });
+});
+
+// ───── Floating screens behind trucks ─────
+const screenMeshes = [];
+const screenTextures = [];
+const SCREEN_DEPTH = 0.08;
+const SCREEN_RADIUS = 0.25;
+
+function createRoundedRectShape(w, h, r) {
+  const shape = new THREE.Shape();
+  shape.moveTo(-w/2 + r, -h/2);
+  shape.lineTo(w/2 - r, -h/2);
+  shape.quadraticCurveTo(w/2, -h/2, w/2, -h/2 + r);
+  shape.lineTo(w/2, h/2 - r);
+  shape.quadraticCurveTo(w/2, h/2, w/2 - r, h/2);
+  shape.lineTo(-w/2 + r, h/2);
+  shape.quadraticCurveTo(-w/2, h/2, -w/2, h/2 - r);
+  shape.lineTo(-w/2, -h/2 + r);
+  shape.quadraticCurveTo(-w/2, -h/2, -w/2 + r, -h/2);
+  return shape;
+}
+
+const textureLoader = new THREE.TextureLoader();
+
+function buildScreen(i) {
+  const t = config.trucks[i];
+  const sc = config.screens[i];
+  const w = sc.width;
+  const h = sc.height;
+
+  // Remove old screen if rebuilding
+  if (screenMeshes[i]) {
+    scene.remove(screenMeshes[i]);
+    screenMeshes[i].traverse(child => {
+      if (child.geometry) child.geometry.dispose();
+      if (child.material) child.material.dispose();
+    });
+  }
+
+  // Frame
+  const shape = createRoundedRectShape(w, h, SCREEN_RADIUS);
+  const frameGeom = new THREE.ExtrudeGeometry(shape, { depth: SCREEN_DEPTH, bevelEnabled: false });
+  const frameMat = new THREE.MeshStandardMaterial({ color: 0x1a1a2e, roughness: 0.3, metalness: 0.6 });
+  const frameMesh = new THREE.Mesh(frameGeom, frameMat);
+  frameMesh.castShadow = true;
+
+  // Image plane (rounded to match frame)
+  if (!screenTextures[i]) {
+    screenTextures[i] = textureLoader.load(`/imgs/${t.img}`);
+    screenTextures[i].colorSpace = THREE.SRGBColorSpace;
+    screenTextures[i].anisotropy = renderer.capabilities.getMaxAnisotropy();
+  }
+  const imgInset = 0.1;
+  const imgW = w - imgInset * 2;
+  const imgH = h - imgInset * 2;
+  const imgRadius = Math.max(SCREEN_RADIUS - imgInset, 0.05);
+  const imgShape = createRoundedRectShape(imgW, imgH, imgRadius);
+  const imgGeom = new THREE.ShapeGeometry(imgShape);
+  // Compute UVs to map texture across the rounded shape
+  const pos = imgGeom.attributes.position;
+  const uvs = imgGeom.attributes.uv;
+  for (let j = 0; j < pos.count; j++) {
+    uvs.setXY(j, (pos.getX(j) + imgW / 2) / imgW, (pos.getY(j) + imgH / 2) / imgH);
+  }
+  const imgMat = new THREE.MeshBasicMaterial({ map: screenTextures[i] });
+  const imgMesh = new THREE.Mesh(imgGeom, imgMat);
+  imgMesh.position.z = SCREEN_DEPTH + 0.01;
+
+  const screenGroup = new THREE.Group();
+  screenGroup.add(frameMesh);
+  screenGroup.add(imgMesh);
+
+  screenGroup.position.set(t.posX + sc.offsetX, t.posY + sc.offsetY, t.posZ + sc.offsetZ);
+  screenGroup.rotation.y = t.rotY + sc.rotY;
+  screenGroup.scale.setScalar(sc.scale);
+
+  scene.add(screenGroup);
+  screenMeshes[i] = screenGroup;
+}
+
+config.trucks.forEach((_, i) => buildScreen(i));
+
+// ───── Debug panel ─────
+const debugEl = document.getElementById('debug');
+let debugVisible = false;
+
+function buildDebugPanel() {
+  let html = '';
+
+  config.trucks.forEach((t, i) => {
+    html += `<h3>${t.name}</h3>`;
+    html += slider(`truck-${i}-posX`, 'posX', t.posX, -50, 50, 0.1);
+    html += slider(`truck-${i}-posY`, 'posY', t.posY, -10, 20, 0.1);
+    html += slider(`truck-${i}-posZ`, 'posZ', t.posZ, -50, 50, 0.1);
+    html += slider(`truck-${i}-rotY`, 'rotY', t.rotY, -Math.PI, Math.PI, 0.05);
+    html += slider(`truck-${i}-scale`, 'scale', t.scale, 0.01, 100, 0.1);
+  });
+
+  config.screens.forEach((s, i) => {
+    html += `<h3>Screen ${i} (${config.trucks[i].name})</h3>`;
+    html += slider(`scr-${i}-offsetX`, 'offX', s.offsetX, -15, 15, 0.1);
+    html += slider(`scr-${i}-offsetY`, 'offY', s.offsetY, -5, 15, 0.1);
+    html += slider(`scr-${i}-offsetZ`, 'offZ', s.offsetZ, -15, 15, 0.1);
+    html += slider(`scr-${i}-rotY`, 'rotY', s.rotY, -Math.PI, Math.PI, 0.05);
+    html += slider(`scr-${i}-scale`, 'scale', s.scale, 0.1, 5, 0.1);
+    html += slider(`scr-${i}-width`, 'width', s.width, 0.5, 15, 0.1);
+    html += slider(`scr-${i}-height`, 'height', s.height, 0.5, 15, 0.1);
+  });
+
+  html += `<h3>Ground Text ("Platter")</h3>`;
+  html += slider('gt-posX', 'posX', config.groundText.posX, -50, 50, 0.1);
+  html += slider('gt-posZ', 'posZ', config.groundText.posZ, -50, 50, 0.1);
+  html += slider('gt-scale', 'scale', config.groundText.scale, 0.1, 20, 0.1);
+
+  html += `<h3>Subtitle</h3>`;
+  html += slider('sub-posX', 'posX', config.subtitle.posX, -50, 50, 0.1);
+  html += slider('sub-posZ', 'posZ', config.subtitle.posZ, -50, 50, 0.1);
+  html += slider('sub-scale', 'scale', config.subtitle.scale, 0.1, 20, 0.1);
+
+  html += `<h3>Button</h3>`;
+  html += slider('btn-posX', 'posX', config.button.posX, -50, 50, 0.1);
+  html += slider('btn-posY', 'posY', config.button.posY, -10, 20, 0.1);
+  html += slider('btn-posZ', 'posZ', config.button.posZ, -50, 50, 0.1);
+  html += slider('btn-scale', 'scale', config.button.scale, 0.1, 20, 0.1);
+
+  html += `<h3>Camera</h3>`;
+  html += slider('cam-posX', 'posX', camera.position.x, -50, 50, 0.1);
+  html += slider('cam-posY', 'posY', camera.position.y, -10, 50, 0.1);
+  html += slider('cam-posZ', 'posZ', camera.position.z, -50, 50, 0.1);
+  html += slider('cam-targetX', 'tgtX', controls.target.x, -50, 50, 0.1);
+  html += slider('cam-targetY', 'tgtY', controls.target.y, -10, 50, 0.1);
+  html += slider('cam-targetZ', 'tgtZ', controls.target.z, -50, 50, 0.1);
+
+  html += `<button onclick="window.__copyDebugConfig()">Copy Config</button>`;
+  debugEl.innerHTML = html;
+
+  // Bind slider events
+  debugEl.querySelectorAll('input[type=range]').forEach((inp) => {
+    inp.addEventListener('input', onSliderChange);
+  });
+}
+
+function slider(id, label, value, min, max, step) {
+  return `<label>
+    <span>${label}</span>
+    <input type="range" id="${id}" min="${min}" max="${max}" step="${step}" value="${value}">
+    <span class="val" id="${id}-val">${Number(value).toFixed(1)}</span>
+  </label>`;
+}
+
+function onSliderChange(e) {
+  const id = e.target.id;
+  const v = parseFloat(e.target.value);
+  document.getElementById(id + '-val').textContent = v.toFixed(1);
+
+  // Apply to scene
+  const parts = id.split('-');
+  if (parts[0] === 'truck') {
+    const idx = parseInt(parts[1]);
+    const prop = parts[2];
+    config.trucks[idx][prop] = v;
+    if (truckMeshes[idx]) {
+      if (prop === 'posX') truckMeshes[idx].position.x = v;
+      if (prop === 'posY') truckMeshes[idx].position.y = v;
+      if (prop === 'posZ') truckMeshes[idx].position.z = v;
+      if (prop === 'rotY') truckMeshes[idx].rotation.y = v;
+      if (prop === 'scale') truckMeshes[idx].scale.setScalar((baseScales[idx] || 1) * v);
+    }
+    // Keep screen in sync with truck
+    if (screenMeshes[idx]) {
+      const sc = config.screens[idx];
+      const tc = config.trucks[idx];
+      screenMeshes[idx].position.set(tc.posX + sc.offsetX, tc.posY + sc.offsetY, tc.posZ + sc.offsetZ);
+      screenMeshes[idx].rotation.y = tc.rotY + sc.rotY;
+    }
+  } else if (parts[0] === 'scr') {
+    const idx = parseInt(parts[1]);
+    const prop = parts[2];
+    const sc = config.screens[idx];
+    const t = config.trucks[idx];
+    sc[prop] = v;
+    if (prop === 'width' || prop === 'height') {
+      buildScreen(idx);
+    } else if (screenMeshes[idx]) {
+      screenMeshes[idx].position.set(t.posX + sc.offsetX, t.posY + sc.offsetY, t.posZ + sc.offsetZ);
+      screenMeshes[idx].rotation.y = t.rotY + sc.rotY;
+      if (prop === 'scale') screenMeshes[idx].scale.setScalar(v);
+    }
+  } else if (parts[0] === 'gt') {
+    const prop = parts[1];
+    config.groundText[prop] = v;
+    if (groundTextMesh) {
+      if (prop === 'posX') groundTextMesh.position.x = v;
+      if (prop === 'posZ') groundTextMesh.position.z = v;
+      if (prop === 'scale') groundTextMesh.scale.setScalar(v);
+    }
+  } else if (parts[0] === 'sub') {
+    const prop = parts[1];
+    config.subtitle[prop] = v;
+    if (subtitleMesh) {
+      if (prop === 'posX') subtitleMesh.position.x = v;
+      if (prop === 'posZ') subtitleMesh.position.z = v;
+      if (prop === 'scale') subtitleMesh.scale.setScalar(v);
+    }
+  } else if (parts[0] === 'btn') {
+    const prop = parts[1];
+    config.button[prop] = v;
+    if (prop === 'posX') btnMesh.position.x = v;
+    if (prop === 'posY') { config.button.posY = v; }
+    if (prop === 'posZ') btnMesh.position.z = v;
+    if (prop === 'scale') btnMesh.scale.setScalar(v);
+  } else if (parts[0] === 'cam') {
+    const prop = parts[1];
+    if (prop === 'posX') camera.position.x = v;
+    if (prop === 'posY') camera.position.y = v;
+    if (prop === 'posZ') camera.position.z = v;
+    if (prop === 'targetX') controls.target.x = v;
+    if (prop === 'targetY') controls.target.y = v;
+    if (prop === 'targetZ') controls.target.z = v;
+  }
+}
+
+window.__copyDebugConfig = () => {
+  const out = {
+    trucks: config.trucks.map(t => ({ ...t })),
+    screens: config.screens.map(s => ({ ...s })),
+    subtitle: { ...config.subtitle },
+    button: { ...config.button },
+    groundText: { ...config.groundText },
+    camera: { posX: camera.position.x, posY: camera.position.y, posZ: camera.position.z, targetX: controls.target.x, targetY: controls.target.y, targetZ: controls.target.z },
+  };
+  navigator.clipboard.writeText(JSON.stringify(out, null, 2));
+  const btn = debugEl.querySelector('button');
+  btn.textContent = 'Copied!';
+  setTimeout(() => btn.textContent = 'Copy Config', 1500);
+};
+
+document.addEventListener('keydown', (e) => {
+  if (e.ctrlKey && e.key === 'd') {
+    e.preventDefault();
+    debugVisible = !debugVisible;
+    debugEl.style.display = debugVisible ? 'block' : 'none';
+    if (debugVisible) buildDebugPanel();
+  }
+});
+
+// ───── Animation loop ─────
+const clock = new THREE.Clock();
+let hoverLerp = 0;
+
+function animate() {
+  requestAnimationFrame(animate);
+  const t = clock.getElapsedTime();
+
+  // Raycaster for button
+  raycaster.setFromCamera(pointer, camera);
+  const hits = raycaster.intersectObject(btnMesh);
+  isHovering = hits.length > 0;
+  renderer.domElement.style.cursor = isHovering ? 'pointer' : 'default';
+
+  // Button hover bounce + idle bob
+  const targetHover = isHovering ? 1 : 0;
+  hoverLerp += (targetHover - hoverLerp) * 0.1;
+  const bob = Math.sin(t * 2) * 0.05;
+  const hoverOffset = hoverLerp * 0.4;
+  btnMesh.position.y = config.button.posY + bob + hoverOffset;
+
+  controls.update();
+  renderer.render(scene, camera);
+}
+animate();
+
+// ───── Resize ─────
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+</script>
 </body>
 </html>

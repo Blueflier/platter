@@ -1,38 +1,65 @@
 [
   {
-    "id": "66783ba8-806a-41a9-bb7d-1aaaed2843a5",
-    "name": "Dynasty Nail",
-    "slug": "dynasty-nail",
-    "live_url": "https://dynasty-nail.onrender.com",
-    "email": null,
-    "generated_at": "2026-02-27T21:21:02.046Z",
+    "id": "test-001",
+    "name": "Sunrise Nails & Spa",
+    "slug": "sunrise-nails-sf",
+    "live_url": "https://platter-sunrise-nails-sf.onrender.com",
+    "email": "sunrise.nails.sf@gmail.com",
+    "generated_at": "2026-02-27T20:45:45.710Z",
     "status": "active"
   },
   {
-    "id": "e55c2a37-861a-4995-8031-08e5945722be",
-    "name": "Luxe Nails",
-    "slug": "luxe-nails",
-    "live_url": "https://luxe-nails.onrender.com",
-    "email": null,
-    "generated_at": "2026-02-27T21:55:31.845Z",
+    "id": "test-002",
+    "name": "Masa's Taqueria",
+    "slug": "masas-taqueria",
+    "live_url": "https://platter-masas-taqueria.onrender.com",
+    "email": "masataqueria@gmail.com",
+    "generated_at": "2026-02-27T21:14:22.212Z",
     "status": "active"
   },
   {
-    "id": "d6ad03a7-a15b-45e7-ba75-045345c5ad9b",
-    "name": "Blue pearl nails",
-    "slug": "blue-pearl-nails",
-    "live_url": "https://blue-pearl-nails.onrender.com",
-    "email": null,
-    "generated_at": "2026-02-27T21:55:31.847Z",
+    "id": "test-ds-001",
+    "name": "Jade Blossom Nail Spa",
+    "slug": "jade-blossom-nail-spa",
+    "live_url": "https://platter-jade-blossom-nail-spa.onrender.com",
+    "email": "hello@jadeblossomspa.com",
+    "generated_at": "2026-02-27T21:35:50.505Z",
     "status": "active"
   },
   {
-    "id": "15a12af5-d458-4326-b808-1859851ce9b1",
-    "name": "Mohka House",
-    "slug": "mohka-house",
-    "live_url": "https://mohka-house.onrender.com",
-    "email": null,
-    "generated_at": "2026-02-27T21:58:33.753Z",
+    "id": "test-3js-001",
+    "name": "Noir Barbershop",
+    "slug": "noir-barbershop",
+    "live_url": "https://platter-noir-barbershop.onrender.com",
+    "email": "book@noirbarbershop.com",
+    "generated_at": "2026-02-27T21:59:59.912Z",
+    "status": "active"
+  },
+  {
+    "id": "test-claude-001",
+    "name": "Noir Barbershop",
+    "slug": "noir-barbershop-v2",
+    "live_url": "https://platter-noir-barbershop-v2.onrender.com",
+    "email": "book@noirbarbershop.com",
+    "generated_at": "2026-02-27T22:05:23.096Z",
+    "status": "active"
+  },
+  {
+    "id": "test-claude-002",
+    "name": "Jade Blossom Nail Spa",
+    "slug": "jade-blossom-v2",
+    "live_url": "https://platter-jade-blossom-v2.onrender.com",
+    "email": "hello@jadeblossomspa.com",
+    "generated_at": "2026-02-27T22:09:39.313Z",
+    "status": "active"
+  },
+  {
+    "id": "test-light-001",
+    "name": "Jade Blossom Nail Spa",
+    "slug": "jade-blossom-v3",
+    "live_url": "https://platter-jade-blossom-v3.onrender.com",
+    "email": "hello@jadeblossomspa.com",
+    "generated_at": "2026-02-27T22:15:55.744Z",
     "status": "active"
   }
 ]

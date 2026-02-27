@@ -1,3 +1,4 @@
 node_modules/
 .env
 websites/
+.sites-repo/
