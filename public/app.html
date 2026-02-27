@@ -107,11 +107,19 @@
     }
 
     .logo {
+      display: flex;
+      align-items: center;
       font-size: 1.35rem;
       font-weight: 700;
       letter-spacing: -0.02em;
       color: #1e293b;
       text-decoration: none;
+    }
+    .logo img {
+      height: 4.5rem;
+      width: auto;
+      margin-right: 0.5rem;
+      vertical-align: middle;
     }
 
     /* ---- search ---- */
@@ -640,9 +648,9 @@
   </div>
 
   <div class="app">
-    <!-- header: just text, no icon -->
+    <!-- header: logo + name -->
     <div class="header">
-      <a href="/" class="logo">Platter</a>
+      <a href="/" class="logo"><img src="logo.png" alt="">Platter</a>
     </div>
 
     <!-- search row with info button -->
