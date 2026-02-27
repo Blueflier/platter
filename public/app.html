@@ -294,6 +294,86 @@
       font-style: italic;
     }
 
+    /* ---- live log ---- */
+    .log-panel {
+      display: none;
+      margin-bottom: 1rem;
+      max-height: 200px;
+      overflow-y: auto;
+      background: #1e293b;
+      border-radius: 12px;
+      padding: 0.75rem 1rem;
+      font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+      font-size: 0.75rem;
+      line-height: 1.7;
+      color: #94a3b8;
+    }
+
+    .log-panel.open { display: block; }
+
+    .log-panel .log-line {
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .log-panel .log-line .log-time {
+      color: #475569;
+      margin-right: 0.5rem;
+    }
+
+    .log-panel .log-line.log-highlight {
+      color: #6b9cf7;
+    }
+
+    .log-panel .log-line.log-success {
+      color: #34d399;
+    }
+
+    .log-panel .log-line.log-error {
+      color: #f87171;
+    }
+
+    /* ---- 3D progress bar ---- */
+    #progressWrap {
+      display: none;
+      position: relative;
+      height: 60px;
+      margin-bottom: 1rem;
+    }
+
+    #progressWrap.open { display: block; }
+
+    #progress-canvas {
+      width: 100%;
+      height: 40px;
+      display: block;
+    }
+
+    .progress-labels {
+      display: flex;
+      width: 100%;
+      position: absolute;
+      bottom: 0;
+      left: 0;
+    }
+
+    .progress-labels span {
+      flex: 1;
+      text-align: center;
+      font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+      font-size: 0.7rem;
+      color: #64748b;
+    }
+
+    .progress-labels span.active-label {
+      color: #1e293b;
+      font-weight: 600;
+    }
+
+    .progress-labels span.completed-label {
+      color: #6b9cf7;
+    }
+
     /* ---- results area ---- */
     .results-area {
       margin-top: 0.5rem;
@@ -657,7 +737,7 @@
     <!-- search row with info button -->
     <div class="search-row">
       <div class="search-wrap">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
         <input type="text" id="searchInput" placeholder="" autofocus>
         <div class="typed-placeholder" id="typedPlaceholder"><span id="typedText"></span><span class="cursor"></span></div>
       </div>
@@ -677,6 +757,21 @@
           <li>Use <strong>Save for Later</strong> to bookmark businesses you want to follow up on</li>
         </ol>
         <p class="hint">Tip: Be specific with your search to get the best results.</p>
+      </div>
+    </div>
+
+    <!-- live log -->
+    <div class="log-panel" id="logPanel"></div>
+
+    <!-- 3D progress bar -->
+    <div id="progressWrap">
+      <canvas id="progress-canvas"></canvas>
+      <div class="progress-labels">
+        <span id="plbl-0">Search</span>
+        <span id="plbl-1">Filter</span>
+        <span id="plbl-2">Research</span>
+        <span id="plbl-3">Generate</span>
+        <span id="plbl-4">Deploy</span>
       </div>
     </div>
 
@@ -709,17 +804,75 @@
     const savedToggle = document.getElementById('savedToggle');
     const savedCountEl = document.getElementById('savedCount');
     const savedToggleLabel = document.getElementById('savedToggleLabel');
+    const logPanel = document.getElementById('logPanel');
     const infoBtn = document.getElementById('infoBtn');
     const infoModal = document.getElementById('infoModal');
     const modalClose = document.getElementById('modalClose');
     const typedPlaceholder = document.getElementById('typedPlaceholder');
     const typedText = document.getElementById('typedText');
 
-    let debounceTimer;
     let currentSearchId = null;
     let pollTimer = null;
     let savedVisible = false;
     let savedItems = [];
+    let lastLogTime = 0;
+
+    // ---- progress bar state ----
+    window.progressStage = -1;
+    const progressWrap = document.getElementById('progressWrap');
+    const stageRegexes = [
+      /Searching Google Places/,
+      /Checking for existing websites|has website|no website found/,
+      /Researching business online|Waiting for research|Research complete/,
+      /Generating website/,
+      /Website deployed|All businesses processed/,
+    ];
+    const stageLabels = ['plbl-0','plbl-1','plbl-2','plbl-3','plbl-4'].map(id => document.getElementById(id));
+
+    function deriveStage(msg) {
+      for (let i = stageRegexes.length - 1; i >= 0; i--) {
+        if (stageRegexes[i].test(msg)) return i;
+      }
+      return -1;
+    }
+
+    function setProgressStage(idx) {
+      if (idx <= window.progressStage) return;
+      window.progressStage = idx;
+      stageLabels.forEach((lbl, i) => {
+        lbl.className = i < idx ? 'completed-label' : i === idx ? 'active-label' : '';
+      });
+      if (typeof window.updateProgressBar === 'function') {
+        window.updateProgressBar(idx);
+      }
+    }
+
+    function appendLogs(logs) {
+      if (!logs || !logs.length) return;
+      logPanel.classList.add('open');
+      progressWrap.classList.add('open');
+      for (const entry of logs) {
+        const line = document.createElement('div');
+        line.className = 'log-line';
+        // color coding
+        if (entry.msg.includes('deployed') || entry.msg.includes('complete') || entry.msg.includes('All businesses')) {
+          line.classList.add('log-success');
+        } else if (entry.msg.includes('failed') || entry.msg.includes('error') || entry.msg.includes('timed out')) {
+          line.classList.add('log-error');
+        } else if (entry.msg.includes('Generating') || entry.msg.includes('Searching') || entry.msg.includes('Researching')) {
+          line.classList.add('log-highlight');
+        }
+        const time = new Date(entry.t).toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        line.innerHTML = `<span class="log-time">${time}</span>${esc(entry.msg)}`;
+        logPanel.appendChild(line);
+        if (entry.t > lastLogTime) lastLogTime = entry.t;
+
+        // derive progress stage
+        const s = deriveStage(entry.msg);
+        if (s >= 0) setProgressStage(s);
+      }
+      logPanel.scrollTop = logPanel.scrollHeight;
+    }
 
     // ---- typing placeholder animation ----
     const placeholderExamples = [
@@ -790,18 +943,9 @@
       if (e.key === 'Escape') infoModal.classList.remove('open');
     });
 
-    // --- search triggers ---
-    searchInput.addEventListener('input', () => {
-      clearTimeout(debounceTimer);
-      debounceTimer = setTimeout(() => {
-        const q = searchInput.value.trim();
-        if (q) startSearch(q);
-      }, 800);
-    });
-
+    // --- search triggers (Enter only) ---
     searchInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
-        clearTimeout(debounceTimer);
         const q = searchInput.value.trim();
         if (q) startSearch(q);
       }
@@ -815,50 +959,39 @@
       savedSection.style.display = savedVisible ? 'block' : 'none';
     });
 
-    // --- mock data for UI preview ---
-    const mockBusinesses = [
-      {
-        id: 'mock-1',
-        name: 'Sunrise Nails & Spa',
-        google_rating: 4.7,
-        google_reviews: 238,
-        address: '1842 Irving St, San Francisco, CA 94122',
-        phone: '(415) 555-0142',
-        email: 'sunrise.nails.sf@gmail.com',
-        live_url: 'https://sunrisenailssf.platter.site',
-        style: 'Elegant & Calm',
-        description: 'A neighborhood gem known for their meticulous gel work and relaxing atmosphere. Loyal clientele of 10+ years.',
-      },
-      {
-        id: 'mock-2',
-        name: 'Golden Gate Auto Repair',
-        google_rating: 4.9,
-        google_reviews: 412,
-        address: '750 Bay Shore Blvd, San Francisco, CA 94124',
-        phone: '(415) 555-0387',
-        email: null,
-        live_url: 'https://goldengateauto.platter.site',
-        style: 'Bold & Trustworthy',
-        description: 'Family-owned since 1998. Specializes in European imports. The go-to shop on Yelp for honest pricing.',
-      },
-      {
-        id: 'mock-3',
-        name: 'Masa\'s Taqueria',
-        google_rating: 4.5,
-        google_reviews: 189,
-        address: '2987 24th St, San Francisco, CA 94110',
-        phone: '(415) 555-0219',
-        email: 'masataqueria@gmail.com',
-        live_url: 'https://masastaqueria.platter.site',
-        style: 'Vibrant & Warm',
-        description: 'Beloved Mission District taqueria famous for their al pastor and house-made horchata. Cash only, always a line.',
-      },
-    ];
+    // load generated sites on startup (only if no active search)
+    const resumeSearchId = sessionStorage.getItem('activeSearchId');
+    if (!resumeSearchId) {
+      loadGenerated();
+    }
 
-    // render mock cards on load
-    statusEl.textContent = `${mockBusinesses.length} businesses found.`;
-    for (const biz of mockBusinesses) {
-      renderCard(biz, cardsEl, false);
+    async function loadGenerated() {
+      try {
+        const res = await fetch('/api/generated');
+        const sites = await res.json();
+        cardsEl.innerHTML = '';
+        if (sites.length === 0) {
+          statusEl.textContent = 'No generated sites yet. Run a search to get started.';
+          return;
+        }
+        statusEl.textContent = `${sites.length} generated`;
+        for (const site of sites) {
+          renderCard(site, cardsEl, false);
+        }
+      } catch {
+        statusEl.textContent = 'Failed to load generated sites.';
+      }
+    }
+
+    // --- resume in-progress search on reload ---
+    if (resumeSearchId) {
+      currentSearchId = resumeSearchId;
+      statusEl.innerHTML = '<span class="spinner"></span> Resuming...';
+      logPanel.classList.add('open');
+      progressWrap.classList.add('open');
+      // fetch all logs from the beginning to rebuild state
+      lastLogTime = 0;
+      pollStatus(resumeSearchId);
     }
 
     // --- search flow ---
@@ -868,8 +1001,15 @@
       cardsEl.innerHTML = '';
       savedCardsEl.innerHTML = '';
       savedItems = [];
+      lastLogTime = 0;
+      logPanel.innerHTML = '';
+      logPanel.classList.remove('open');
+      window.progressStage = -1;
+      progressWrap.classList.remove('open');
+      stageLabels.forEach(lbl => { lbl.className = ''; });
+      if (typeof window.updateProgressBar === 'function') window.updateProgressBar(-1);
       updateSavedBadge();
-      statusEl.innerHTML = '<span class="spinner"></span> Finding businesses...';
+      statusEl.innerHTML = '<span class="spinner"></span> Starting...';
 
       try {
         const res = await fetch('/api/search', {
@@ -879,6 +1019,7 @@
         });
         const { search_id } = await res.json();
         currentSearchId = search_id;
+        sessionStorage.setItem('activeSearchId', search_id);
         pollStatus(search_id);
       } catch (err) {
         statusEl.textContent = 'Search failed. Try again.';
@@ -888,24 +1029,30 @@
     function pollStatus(searchId) {
       pollTimer = setInterval(async () => {
         try {
-          const res = await fetch(`/api/search/${searchId}/status`);
+          const res = await fetch(`/api/search/${searchId}/status?since=${lastLogTime}`);
           const data = await res.json();
+
+          appendLogs(data.logs);
 
           if (data.status === 'completed') {
             clearInterval(pollTimer);
-            statusEl.textContent = `${data.total} businesses found.`;
+            sessionStorage.removeItem('activeSearchId');
+            statusEl.textContent = `${data.total} total`;
             loadResults(searchId);
           } else if (data.status === 'failed') {
             clearInterval(pollTimer);
+            sessionStorage.removeItem('activeSearchId');
             statusEl.textContent = 'Search failed.';
           } else {
-            statusEl.innerHTML = `<span class="spinner"></span> Researching businesses... ${data.completed}/${data.total}`;
+            const progress = data.total > 0 ? ` ${data.completed}/${data.total}` : '';
+            statusEl.innerHTML = `<span class="spinner"></span>${progress}`;
           }
         } catch {
           clearInterval(pollTimer);
+          sessionStorage.removeItem('activeSearchId');
           statusEl.textContent = 'Connection lost.';
         }
-      }, 3000);
+      }, 2000);
     }
 
     async function loadResults(searchId) {
@@ -979,12 +1126,14 @@
       const copyBtn = card.querySelector('[data-copy]');
       if (copyBtn) {
         copyBtn.addEventListener('click', () => {
+          // lock width so button doesn't resize on text change
+          copyBtn.style.minWidth = copyBtn.offsetWidth + 'px';
           navigator.clipboard.writeText(card._draft).then(() => {
             copyBtn.textContent = 'Copied!';
             copyBtn.classList.add('btn-copied');
             copyBtn.classList.remove('btn-primary');
             setTimeout(() => {
-              copyBtn.textContent = 'Copy Email';
+              copyBtn.textContent = 'Copy Email Draft';
               copyBtn.classList.remove('btn-copied');
               copyBtn.classList.add('btn-primary');
             }, 2000);
@@ -1209,6 +1358,134 @@
       cfg.opacity = cfgOpacity.value / 100;
       cfgOpacityVal.textContent = cfg.opacity.toFixed(2);
     });
+
+    // ---- 3D Progress Bar ----
+    {
+      const pCanvas = document.getElementById('progress-canvas');
+      const pRenderer = new THREE.WebGLRenderer({ canvas: pCanvas, alpha: true, antialias: true });
+      pRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+      const pScene = new THREE.Scene();
+
+      // orthographic camera with slight isometric tilt
+      const frustum = 4;
+      const aspect = pCanvas.clientWidth / pCanvas.clientHeight;
+      const pCamera = new THREE.OrthographicCamera(
+        -frustum * aspect / 2, frustum * aspect / 2,
+        frustum / 2, -frustum / 2, 0.1, 50
+      );
+      pCamera.position.set(0, 2.5, 5);
+      pCamera.lookAt(0, 0, 0);
+
+      // lighting
+      const pAmbient = new THREE.AmbientLight(0xffffff, 0.8);
+      pScene.add(pAmbient);
+      const pDir = new THREE.DirectionalLight(0xffffff, 1.2);
+      pDir.position.set(3, 5, 4);
+      pScene.add(pDir);
+
+      // build 5 segments
+      const segCount = 5;
+      const totalW = 6;
+      const gap = 0.06;
+      const segW = (totalW - gap * (segCount - 1)) / segCount;
+      const segH = 0.4;
+      const segD = 0.25;
+      const inactiveColor = 0xdde4ee;
+      const activeColor = 0x6b9cf7;
+
+      const barGroup = new THREE.Group();
+      const boxes = [];
+      const materials = [];
+
+      for (let i = 0; i < segCount; i++) {
+        const geo = new THREE.BoxGeometry(segW, segH, segD);
+        const mat = new THREE.MeshStandardMaterial({ color: inactiveColor, flatShading: true });
+        const mesh = new THREE.Mesh(geo, mat);
+        const x = -totalW / 2 + segW / 2 + i * (segW + gap);
+        mesh.position.set(x, 0, 0);
+        barGroup.add(mesh);
+        boxes.push(mesh);
+        materials.push(mat);
+      }
+
+      pScene.add(barGroup);
+
+      // edge outline for active segment
+      let activeOutline = null;
+
+      function updateBar(stageIndex) {
+        // remove old outline
+        if (activeOutline) {
+          barGroup.remove(activeOutline);
+          activeOutline = null;
+        }
+
+        for (let i = 0; i < segCount; i++) {
+          if (stageIndex < 0) {
+            materials[i].color.setHex(inactiveColor);
+          } else if (i <= stageIndex) {
+            materials[i].color.setHex(activeColor);
+          } else {
+            materials[i].color.setHex(inactiveColor);
+          }
+        }
+
+        // add outline on active segment
+        if (stageIndex >= 0 && stageIndex < segCount) {
+          const edges = new THREE.EdgesGeometry(boxes[stageIndex].geometry);
+          activeOutline = new THREE.LineSegments(
+            edges,
+            new THREE.LineBasicMaterial({ color: 0x000000, linewidth: 1.5 })
+          );
+          activeOutline.position.copy(boxes[stageIndex].position);
+          barGroup.add(activeOutline);
+        }
+      }
+
+      window.updateProgressBar = updateBar;
+
+      // resize handler
+      function resizeProgress() {
+        const w = pCanvas.clientWidth;
+        const h = pCanvas.clientHeight;
+        if (w === 0 || h === 0) return;
+        const a = w / h;
+        pCamera.left = -frustum * a / 2;
+        pCamera.right = frustum * a / 2;
+        pCamera.top = frustum / 2;
+        pCamera.bottom = -frustum / 2;
+        pCamera.updateProjectionMatrix();
+        pRenderer.setSize(w, h, false);
+      }
+
+      let lastW = 0, lastH = 0;
+
+      function progressLoop() {
+        requestAnimationFrame(progressLoop);
+        const w = pCanvas.clientWidth;
+        const h = pCanvas.clientHeight;
+        if (w === 0 || h === 0) return;
+
+        // resize renderer + camera when canvas size changes (e.g. first show)
+        if (w !== lastW || h !== lastH) {
+          lastW = w; lastH = h;
+          const a = w / h;
+          pCamera.left = -frustum * a / 2;
+          pCamera.right = frustum * a / 2;
+          pCamera.top = frustum / 2;
+          pCamera.bottom = -frustum / 2;
+          pCamera.updateProjectionMatrix();
+          pRenderer.setSize(w, h, false);
+        }
+
+        barGroup.rotation.y += 0.001;
+        if (barGroup.rotation.y > 0.15) barGroup.rotation.y = -0.15;
+
+        pRenderer.render(pScene, pCamera);
+      }
+      progressLoop();
+    }
   </script>
 </body>
 </html>

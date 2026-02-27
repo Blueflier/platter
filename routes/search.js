@@ -22,7 +22,7 @@ router.post('/search', async (req, res) => {
   }
 
   const searchId = uuidv4();
-  searches[searchId] = { status: 'pending', businesses: [], completed: 0, total: 0 };
+  searches[searchId] = { status: 'pending', businesses: [], completed: 0, total: 0, logs: [] };
   res.json({ search_id: searchId });
 
   runPipeline(searchId, q).catch(err => {
@@ -37,22 +37,33 @@ async function runPipeline(searchId, query) {
   if (!search) return;
 
   search.status = 'processing';
+  const log = (msg) => search.logs.push({ t: Date.now(), msg });
+
+  log(`Searching Google Places for "${query}"...`);
 
   let placeRefs = [];
   try {
     placeRefs = await googlePlaces.textSearch(query);
   } catch (err) {
     console.error('Google Places textSearch:', err);
+    log('Google Places search failed.');
     search.status = 'failed';
     return;
   }
 
+  log(`Found ${placeRefs.length} places. Checking for existing websites...`);
+
   const noWebsitePlaces = [];
-  for (const ref of placeRefs) {
+  for (let i = 0; i < placeRefs.length; i++) {
+    const ref = placeRefs[i];
     try {
       const detail = await googlePlaces.getDetails(ref.place_id);
       if (!detail) continue;
-      if (detail.website) continue; // has website — skip
+      if (detail.website) {
+        log(`${detail.name || ref.name} — has website, skipping`);
+        continue;
+      }
+      log(`${detail.name || ref.name} — no website found`);
       const openingHours = detail.opening_hours && detail.opening_hours.weekday_text && Array.isArray(detail.opening_hours.weekday_text)
         ? detail.opening_hours.weekday_text.join('; ')
         : null;
@@ -80,25 +91,36 @@ async function runPipeline(searchId, query) {
   const toProcess = noWebsitePlaces.filter(
     (p) => !alreadyExists(existing, p.name, p.address)
   );
+  const dupeCount = noWebsitePlaces.length - toProcess.length;
+  if (dupeCount > 0) log(`Skipped ${dupeCount} duplicate(s) already in database.`);
 
   search.total = toProcess.length;
   if (toProcess.length === 0) {
+    log('No new businesses without websites found.');
     search.status = 'completed';
     return;
   }
+
+  log(`${toProcess.length} businesses to process. Starting enrichment + site generation...`);
 
   // One Yutori task per place; run all in parallel (each: create -> poll -> append -> generate)
   const runOne = async (place) => {
     const slug = slugify(place.name);
     let taskId;
+
+    log(`[${place.name}] Researching business online...`);
     try {
       const created = await yutori.createTask(place.name, place.address);
       taskId = created.task_id;
     } catch (err) {
       console.error('Yutori create error for', place.name, err.message);
+      log(`[${place.name}] Research failed — skipping`);
+      search.completed += 1;
+      if (search.completed >= search.total) search.status = 'completed';
       return;
     }
 
+    log(`[${place.name}] Waiting for research results...`);
     let email = null, style = null, description = '', phoneSupplement = null, businessHours = null, socialMediaLinks = [];
     try {
       const parsed = await yutori.pollTask(taskId);
@@ -108,9 +130,11 @@ async function runPipeline(searchId, query) {
       phoneSupplement = parsed.phone || null;
       businessHours = parsed.business_hours || null;
       socialMediaLinks = Array.isArray(parsed.social_media_links) ? parsed.social_media_links : [];
+      log(`[${place.name}] Research complete${email ? ` — found email: ${email}` : ' — no email found'}`);
     } catch (err) {
       console.error('Yutori poll error for', place.name, err.message);
       description = place.editorial_summary || '';
+      log(`[${place.name}] Research timed out — using Google data`);
     }
     const finalPhone = place.phone || phoneSupplement;
     const finalBusinessHours = place.opening_hours || businessHours;
@@ -141,6 +165,7 @@ async function runPipeline(searchId, query) {
     }
 
     // Call POST /api/generate for this business
+    log(`[${place.name}] Generating website with AI...`);
     let liveUrl = null;
     let emailDraft = null;
     try {
@@ -164,9 +189,13 @@ async function runPipeline(searchId, query) {
         const gen = await genRes.json();
         liveUrl = gen.live_url || null;
         emailDraft = gen.email_draft || null;
+        log(`[${place.name}] Website deployed → ${liveUrl}`);
+      } else {
+        log(`[${place.name}] Website generation failed (${genRes.status})`);
       }
     } catch (err) {
       console.error('Generate call error for', place.name, err.message);
+      log(`[${place.name}] Website generation error`);
     }
 
     const card = {
@@ -179,6 +208,7 @@ async function runPipeline(searchId, query) {
     search.businesses.push(card);
     search.completed += 1;
     if (search.completed >= search.total) {
+      log('All businesses processed.');
       search.status = 'completed';
     }
   };
@@ -190,10 +220,13 @@ async function runPipeline(searchId, query) {
 router.get('/search/:search_id/status', (req, res) => {
   const search = searches[req.params.search_id];
   if (!search) return res.status(404).json({ error: 'Search not found' });
+  const since = parseInt(req.query.since) || 0;
+  const newLogs = since ? search.logs.filter(l => l.t > since) : search.logs;
   res.json({
     status: search.status,
     completed: search.completed,
-    total: search.total
+    total: search.total,
+    logs: newLogs
   });
 });
 
