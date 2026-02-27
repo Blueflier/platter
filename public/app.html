@@ -1,0 +1,545 @@
+<!-- --- DEV B owns this file --- -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Platter</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: #09090b;
+      color: #fafafa;
+      min-height: 100vh;
+    }
+
+    /* ---- layout ---- */
+    .app {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem 4rem;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 2rem;
+    }
+
+    .wordmark {
+      font-size: 0.9rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #a1a1aa;
+      text-decoration: none;
+    }
+
+    .saved-toggle {
+      display: none;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.45rem 1rem;
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: #a1a1aa;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 9999px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .saved-toggle:hover { background: rgba(255,255,255,0.08); }
+    .saved-toggle.active { color: #c084fc; border-color: rgba(192,132,252,0.3); }
+
+    /* ---- search ---- */
+    .search-wrap {
+      position: relative;
+      margin-bottom: 1.5rem;
+    }
+
+    .search-wrap svg {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 18px;
+      height: 18px;
+      color: #52525b;
+      pointer-events: none;
+    }
+
+    #searchInput {
+      width: 100%;
+      padding: 0.85rem 1rem 0.85rem 2.8rem;
+      font-size: 1rem;
+      font-family: inherit;
+      color: #fafafa;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    #searchInput::placeholder { color: #52525b; }
+    #searchInput:focus {
+      border-color: rgba(129,140,248,0.5);
+      box-shadow: 0 0 0 3px rgba(129,140,248,0.1);
+    }
+
+    /* ---- status ---- */
+    .status {
+      font-size: 0.85rem;
+      color: #71717a;
+      margin-bottom: 1.5rem;
+      min-height: 1.3em;
+    }
+
+    .status .spinner {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border: 2px solid rgba(255,255,255,0.1);
+      border-top-color: #818cf8;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      vertical-align: middle;
+      margin-right: 0.4rem;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ---- cards ---- */
+    .cards { display: flex; flex-direction: column; gap: 1rem; }
+
+    .card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 14px;
+      padding: 1.5rem;
+      transition: border-color 0.2s;
+    }
+
+    .card:hover { border-color: rgba(255,255,255,0.12); }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 1rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .card-name {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .card-rating {
+      flex-shrink: 0;
+      font-size: 0.82rem;
+      color: #a1a1aa;
+      white-space: nowrap;
+    }
+
+    .card-rating .star { color: #facc15; }
+
+    .card-meta {
+      font-size: 0.82rem;
+      color: #71717a;
+      line-height: 1.7;
+    }
+
+    .card-meta a {
+      color: #818cf8;
+      text-decoration: none;
+    }
+
+    .card-meta a:hover { text-decoration: underline; }
+
+    .card-style {
+      display: inline-block;
+      margin-top: 0.6rem;
+      padding: 0.2rem 0.65rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: #c084fc;
+      background: rgba(192,132,252,0.1);
+      border-radius: 9999px;
+    }
+
+    .card-desc {
+      margin-top: 0.7rem;
+      font-size: 0.85rem;
+      color: #a1a1aa;
+      line-height: 1.55;
+      font-style: italic;
+    }
+
+    /* email draft area */
+    .draft-section {
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .draft-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #52525b;
+      margin-bottom: 0.5rem;
+    }
+
+    .draft-textarea {
+      width: 100%;
+      min-height: 120px;
+      padding: 0.75rem;
+      font-size: 0.82rem;
+      font-family: inherit;
+      line-height: 1.6;
+      color: #d4d4d8;
+      background: rgba(0,0,0,0.3);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 8px;
+      resize: vertical;
+      outline: none;
+    }
+
+    .draft-textarea:focus {
+      border-color: rgba(129,140,248,0.4);
+    }
+
+    .call-instead {
+      margin-top: 0.75rem;
+      padding: 0.75rem;
+      font-size: 0.85rem;
+      background: rgba(250,204,21,0.06);
+      border: 1px solid rgba(250,204,21,0.12);
+      border-radius: 8px;
+      color: #facc15;
+    }
+
+    /* card actions */
+    .card-actions {
+      margin-top: 0.75rem;
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.5rem 1rem;
+      font-size: 0.82rem;
+      font-weight: 500;
+      font-family: inherit;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+    }
+
+    .btn:active { transform: scale(0.97); }
+
+    .btn-primary {
+      background: #fafafa;
+      color: #09090b;
+    }
+
+    .btn-primary:hover { background: #e4e4e7; }
+
+    .btn-ghost {
+      background: rgba(255,255,255,0.05);
+      color: #a1a1aa;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .btn-ghost:hover { background: rgba(255,255,255,0.08); }
+
+    .btn-copied {
+      background: rgba(74,222,128,0.15);
+      color: #4ade80;
+    }
+
+    /* building state */
+    .card.building {
+      opacity: 0.6;
+    }
+
+    .card.building .card-name::after {
+      content: '';
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border: 2px solid rgba(255,255,255,0.1);
+      border-top-color: #818cf8;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      margin-left: 0.5rem;
+      vertical-align: middle;
+    }
+
+    /* saved section */
+    .saved-section {
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .saved-section h3 {
+      font-size: 0.85rem;
+      color: #52525b;
+      font-weight: 500;
+      margin-bottom: 1rem;
+    }
+
+    .card.saved {
+      opacity: 0.5;
+    }
+
+    .card.saved:hover { opacity: 0.7; }
+
+    /* fade in */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .card { animation: fadeIn 0.3s ease-out; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="header">
+      <a href="/" class="wordmark">Platter</a>
+      <button class="saved-toggle" id="savedToggle">
+        Saved <span id="savedCount">0</span>
+      </button>
+    </div>
+
+    <div class="search-wrap">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg>
+      <input type="text" id="searchInput" placeholder="nail salons in San Francisco" autofocus>
+    </div>
+
+    <div class="status" id="status"></div>
+    <div class="cards" id="cards"></div>
+    <div class="saved-section" id="savedSection" style="display:none;">
+      <h3>Saved for Later</h3>
+      <div class="cards" id="savedCards"></div>
+    </div>
+  </div>
+
+  <script>
+    const searchInput = document.getElementById('searchInput');
+    const statusEl = document.getElementById('status');
+    const cardsEl = document.getElementById('cards');
+    const savedSection = document.getElementById('savedSection');
+    const savedCardsEl = document.getElementById('savedCards');
+    const savedToggle = document.getElementById('savedToggle');
+    const savedCountEl = document.getElementById('savedCount');
+
+    let debounceTimer;
+    let currentSearchId = null;
+    let pollTimer = null;
+    let savedVisible = false;
+    let savedItems = [];
+
+    // --- search triggers ---
+    searchInput.addEventListener('input', () => {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        const q = searchInput.value.trim();
+        if (q) startSearch(q);
+      }, 800);
+    });
+
+    searchInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        clearTimeout(debounceTimer);
+        const q = searchInput.value.trim();
+        if (q) startSearch(q);
+      }
+    });
+
+    // --- saved toggle ---
+    savedToggle.addEventListener('click', () => {
+      savedVisible = !savedVisible;
+      savedToggle.classList.toggle('active', savedVisible);
+      savedSection.style.display = savedVisible ? 'block' : 'none';
+    });
+
+    // --- search flow ---
+    async function startSearch(query) {
+      // reset
+      if (pollTimer) clearInterval(pollTimer);
+      cardsEl.innerHTML = '';
+      savedCardsEl.innerHTML = '';
+      savedItems = [];
+      updateSavedBadge();
+      statusEl.innerHTML = '<span class="spinner"></span> Finding businesses...';
+
+      try {
+        const res = await fetch('/api/search', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query })
+        });
+        const { search_id } = await res.json();
+        currentSearchId = search_id;
+        pollStatus(search_id);
+      } catch (err) {
+        statusEl.textContent = 'Search failed. Try again.';
+      }
+    }
+
+    function pollStatus(searchId) {
+      pollTimer = setInterval(async () => {
+        try {
+          const res = await fetch(`/api/search/${searchId}/status`);
+          const data = await res.json();
+
+          if (data.status === 'completed') {
+            clearInterval(pollTimer);
+            statusEl.textContent = `${data.total} businesses found.`;
+            loadResults(searchId);
+          } else if (data.status === 'failed') {
+            clearInterval(pollTimer);
+            statusEl.textContent = 'Search failed.';
+          } else {
+            statusEl.innerHTML = `<span class="spinner"></span> Researching businesses... ${data.completed}/${data.total}`;
+          }
+        } catch {
+          clearInterval(pollTimer);
+          statusEl.textContent = 'Connection lost.';
+        }
+      }, 3000);
+    }
+
+    async function loadResults(searchId) {
+      try {
+        const res = await fetch(`/api/results/${searchId}`);
+        const businesses = await res.json();
+
+        cardsEl.innerHTML = '';
+        for (const biz of businesses) {
+          renderCard(biz, cardsEl, false);
+        }
+
+        if (businesses.length === 0) {
+          statusEl.textContent = 'No businesses without websites found.';
+        }
+      } catch {
+        statusEl.textContent = 'Failed to load results.';
+      }
+    }
+
+    // --- card rendering ---
+    function renderCard(biz, container, isSaved) {
+      const card = document.createElement('div');
+      card.className = `card${isSaved ? ' saved' : ''}${biz._building ? ' building' : ''}`;
+      card.dataset.id = biz.id;
+
+      const hasEmail = biz.email && biz.email !== 'null';
+      const liveUrl = biz.live_url || '';
+
+      let draftSection = '';
+      if (hasEmail && liveUrl) {
+        const draft = `Subject: We built you a free website\n\nHi ${biz.name},\n\nWe noticed you didn't have a website so we built one for you — take a look:\n${liveUrl}\n\nHappy to chat if you have questions.\n— Platter`;
+        draftSection = `
+          <div class="draft-section">
+            <div class="draft-label">Email draft</div>
+            <textarea class="draft-textarea" data-draft>${draft}</textarea>
+          </div>`;
+      } else if (!hasEmail && biz.phone) {
+        draftSection = `
+          <div class="draft-section">
+            <div class="call-instead">Call instead: ${biz.phone}</div>
+          </div>`;
+      }
+
+      card.innerHTML = `
+        <div class="card-top">
+          <div class="card-name">${esc(biz.name)}</div>
+          ${biz.google_rating ? `<div class="card-rating"><span class="star">&#9733;</span> ${biz.google_rating} (${biz.google_reviews})</div>` : ''}
+        </div>
+        <div class="card-meta">
+          ${biz.address ? `${esc(biz.address)}<br>` : ''}
+          ${biz.phone ? `${esc(biz.phone)}<br>` : ''}
+          ${hasEmail ? `${esc(biz.email)}<br>` : '<span style="color:#52525b">Email not found</span><br>'}
+          ${liveUrl ? `<a href="${esc(liveUrl)}" target="_blank">${esc(liveUrl)}</a>` : ''}
+        </div>
+        ${biz.style ? `<span class="card-style">${esc(biz.style)}</span>` : ''}
+        ${biz.description ? `<div class="card-desc">"${esc(biz.description)}"</div>` : ''}
+        ${draftSection}
+        <div class="card-actions">
+          ${hasEmail && liveUrl ? `<button class="btn btn-primary" data-copy>Copy Email</button>` : ''}
+          ${!isSaved ? `<button class="btn btn-ghost" data-save>Save for Later</button>` : ''}
+        </div>
+      `;
+
+      // copy email
+      const copyBtn = card.querySelector('[data-copy]');
+      if (copyBtn) {
+        copyBtn.addEventListener('click', () => {
+          const textarea = card.querySelector('[data-draft]');
+          if (textarea) {
+            navigator.clipboard.writeText(textarea.value).then(() => {
+              copyBtn.textContent = 'Copied!';
+              copyBtn.classList.add('btn-copied');
+              copyBtn.classList.remove('btn-primary');
+              setTimeout(() => {
+                copyBtn.textContent = 'Copy Email';
+                copyBtn.classList.remove('btn-copied');
+                copyBtn.classList.add('btn-primary');
+              }, 2000);
+            });
+          }
+        });
+      }
+
+      // save for later
+      const saveBtn = card.querySelector('[data-save]');
+      if (saveBtn) {
+        saveBtn.addEventListener('click', async () => {
+          saveBtn.disabled = true;
+          saveBtn.textContent = 'Saving...';
+          try {
+            await fetch(`/api/businesses/${biz.id}`, {
+              method: 'PATCH',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ status: 'saved' })
+            });
+          } catch {}
+
+          card.remove();
+          savedItems.push(biz);
+          updateSavedBadge();
+          renderCard(biz, savedCardsEl, true);
+        });
+      }
+
+      container.appendChild(card);
+    }
+
+    function updateSavedBadge() {
+      savedCountEl.textContent = savedItems.length;
+      savedToggle.style.display = savedItems.length > 0 ? 'inline-flex' : 'none';
+    }
+
+    function esc(str) {
+      const d = document.createElement('div');
+      d.textContent = str || '';
+      return d.innerHTML;
+    }
+  </script>
+</body>
+</html>
