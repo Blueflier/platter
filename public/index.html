@@ -222,7 +222,33 @@ fontLoader.load('https://cdn.jsdelivr.net/npm/three@0.168.0/examples/fonts/helve
 // Rounded base
 const btnShape = createRoundedRectShape(3, 0.8, 0.2);
 const btnBaseGeom = new THREE.ExtrudeGeometry(btnShape, { depth: 0.3, bevelEnabled: false });
-const btnBaseMat = new THREE.MeshStandardMaterial({ color: 0xa78bfa, roughness: 0.3, metalness: 0.2 });
+btnBaseGeom.computeBoundingBox();
+const btnBaseMat = new THREE.ShaderMaterial({
+  uniforms: {
+    colorA: { value: new THREE.Color(0x8b5cf6) }, // purple
+    colorB: { value: new THREE.Color(0x6366f1) }, // blue-indigo
+    bboxMin: { value: btnBaseGeom.boundingBox.min },
+    bboxMax: { value: btnBaseGeom.boundingBox.max },
+  },
+  vertexShader: `
+    varying vec3 vPos;
+    void main() {
+      vPos = position;
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    }
+  `,
+  fragmentShader: `
+    uniform vec3 colorA;
+    uniform vec3 colorB;
+    uniform vec3 bboxMin;
+    uniform vec3 bboxMax;
+    varying vec3 vPos;
+    void main() {
+      float t = (vPos.x - bboxMin.x) / (bboxMax.x - bboxMin.x);
+      gl_FragColor = vec4(mix(colorA, colorB, t), 1.0);
+    }
+  `,
+});
 const btnBaseMesh = new THREE.Mesh(btnBaseGeom, btnBaseMat);
 btnBaseMesh.castShadow = true;
 btnBaseMesh.receiveShadow = true;

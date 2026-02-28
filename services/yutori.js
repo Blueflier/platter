@@ -4,7 +4,7 @@
 const API_KEY = process.env.YUTORI_API_KEY;
 const BASE_URL = 'https://api.yutori.com/v1/research/tasks';
 const POLL_INTERVAL_MS = 3000;
-const POLL_TIMEOUT_MS = 600000; // 10 minutes — no other timeouts
+const POLL_TIMEOUT_MS = 1200000; // 20 minutes — no other timeouts
 
 function buildQuery(businessName, address) {
   return `Research the business '${businessName}' at ${address}. ` +

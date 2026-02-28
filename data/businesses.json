@@ -1,1 +1,134 @@
-[]
+[
+  {
+    "id": "8b51018a-36a2-48ef-bb45-89e010f0a0e3",
+    "name": "Sweet Gelato | Tea Lounge",
+    "address": "979 Story Rd Unit 7084, San Jose, CA 95122, USA",
+    "phone": "(408) 275-9999",
+    "email": null,
+    "has_website": false,
+    "google_reviews": 546,
+    "google_rating": 4.2,
+    "style": "gelato and tea",
+    "description": "Late-night gelato and tea lounge highlights Contact : . Email not publicly listed.",
+    "business_hours": "Monday: 5:00 PM – 2:00 AM; Tuesday: 5:00 PM – 2:00 AM; Wednesday: 5:00 PM – 2:00 AM; Thursday: 5:00 PM – 2:00 AM; Friday: 5:00 PM – 2:00 AM; Saturday: 5:00 PM – 2:00 AM; Sunday: 5:00 PM – 2:00 AM",
+    "social_media_links": [
+      "https://www.yelp.com/biz/sweet-gelato-tea-lounge-san-jose"
+    ],
+    "color_palette": {
+      "theme": "light",
+      "bg": "#FFF8F3",
+      "text": "#2C2C2C",
+      "accent": "#E8956F",
+      "accent2": "#A8D5BA"
+    },
+    "model_url": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/1k/CoffeeTable_01/CoffeeTable_01_1k.gltf",
+    "slug": "sweet-gelato-tea-lounge",
+    "status": "pending"
+  },
+  {
+    "id": "83d76b70-c496-4e1c-bd9a-7bdc19b074fb",
+    "name": "T-Square Coffee & Tea",
+    "address": "1102 Bird Ave. # 20, San Jose, CA 95125, USA",
+    "phone": "(650) 680-5969",
+    "email": null,
+    "has_website": false,
+    "google_reviews": 160,
+    "google_rating": 4.7,
+    "style": "Warm Minimalist / Cozy Modern Clean, simple aesthetic reflecting the business",
+    "description": "T‑Square Coffee & Tea essentials and design brief Vibe & customer experience: A cozy, intimate hidden gem tucked in a strip mall near Walgreens. The space is clean, simple, and quiet—ideal for working or studying.",
+    "business_hours": "Monday: Closed; Tuesday: 7:00 AM – 6:00 PM; Wednesday: 7:00 AM – 6:00 PM; Thursday: 7:00 AM – 6:00 PM; Friday: 7:00 AM – 6:00 PM; Saturday: 7:00 AM – 6:00 PM; Sunday: 7:00 AM – 6:00 PM",
+    "social_media_links": [
+      "https://www.yelp.com/biz/t-square-coffee-and-tea-san-jose-4"
+    ],
+    "color_palette": {
+      "theme": "light",
+      "bg": "#F5F1E8",
+      "text": "#2C2C2C",
+      "accent": "#C17A5C",
+      "accent2": "#A8B8A8"
+    },
+    "model_url": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/1k/CoffeeCart_01/CoffeeCart_01_1k.gltf",
+    "slug": "t-square-coffee-tea",
+    "status": "pending"
+  },
+  {
+    "id": "cf42607a-3a32-47ee-9caf-6d97f236deaa",
+    "name": "Tea Alley",
+    "address": "40 S 1st St, San Jose, CA 95113, USA",
+    "phone": "(408) 217-9486",
+    "email": null,
+    "has_website": false,
+    "google_reviews": 126,
+    "google_rating": 4.1,
+    "style": "Contemporary minimalist with warm Taiwanese influences — clean, modern aesthetic with playful accents reflecting the casual, trendy bubble tea culture",
+    "description": "Late-night Taiwanese bubble tea and snacks Business Name: Tea Alley Casual, trendy, late-night destination with a self-service kiosk ordering system. Offers diverse menu options including pure tea, milk tea, flavored tea, and snacks such as popcorn chicken, lava cheese crispy chicken, pizza dumplings, fried calamari, and onion rings, plus desserts like fried crunchy milk and fried ice cream.",
+    "business_hours": "Monday: 8:30 PM – 2:00 AM; Tuesday: 8:00 PM – 2:00 AM; Wednesday: 8:00 PM – 2:00 AM; Thursday: 8:00 PM – 2:00 AM; Friday: 8:00 PM – 2:00 AM; Saturday: 8:00 PM – 2:00 AM; Sunday: 8:30 PM – 2:00 AM",
+    "social_media_links": [
+      "https://www.yelp.com/biz/tea-alley-san-jose"
+    ],
+    "color_palette": {
+      "theme": "light",
+      "bg": "#f5f1ed",
+      "text": "#2c2c2c",
+      "accent": "#d4845c",
+      "accent2": "#4a9b8e"
+    },
+    "model_url": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/1k/potted_plant_01/potted_plant_01_1k.gltf",
+    "slug": "tea-alley",
+    "status": "pending"
+  },
+  {
+    "id": "84777140-27e1-4b88-b8e8-01182b07e5b3",
+    "name": "Tcafé",
+    "address": "2002 Alum Rock Ave, San Jose, CA 95116, USA",
+    "phone": null,
+    "email": null,
+    "has_website": false,
+    "google_reviews": 57,
+    "google_rating": 4.3,
+    "style": null,
+    "description": "",
+    "business_hours": "Monday: Closed; Tuesday: 10:00 AM – 8:00 PM; Wednesday: 10:00 AM – 9:00 PM; Thursday: 10:00 AM – 9:00 PM; Friday: 10:00 AM – 9:00 PM; Saturday: 10:00 AM – 9:00 PM; Sunday: 10:00 AM – 9:00 PM",
+    "social_media_links": [],
+    "color_palette": null,
+    "model_url": null,
+    "slug": "tcaf",
+    "status": "pending"
+  },
+  {
+    "id": "b3640315-9a21-4bff-95a7-99fe88413c87",
+    "name": "Teasociety San Jose",
+    "address": "1658 E Capitol Expy, San Jose, CA 95121, USA",
+    "phone": "(408) 440-0793",
+    "email": null,
+    "has_website": false,
+    "google_reviews": 232,
+    "google_rating": 4.2,
+    "style": null,
+    "description": "",
+    "business_hours": "Monday: 11:30 AM – 9:00 PM; Tuesday: 11:30 AM – 9:00 PM; Wednesday: 11:30 AM – 9:00 PM; Thursday: 11:30 AM – 9:00 PM; Friday: 11:30 AM – 10:00 PM; Saturday: 11:30 AM – 10:00 PM; Sunday: 11:30 AM – 9:00 PM",
+    "social_media_links": [],
+    "color_palette": null,
+    "model_url": null,
+    "slug": "teasociety-san-jose",
+    "status": "pending"
+  },
+  {
+    "id": "78ddbd68-ebb7-418f-9d11-2482765db28e",
+    "name": "Boba Pub San Jose",
+    "address": "5711 Cottle Rd, San Jose, CA 95123, USA",
+    "phone": "(408) 759-1111",
+    "email": null,
+    "has_website": false,
+    "google_reviews": 18,
+    "google_rating": 4.6,
+    "style": null,
+    "description": "",
+    "business_hours": "Monday: 12:00 – 9:00 PM; Tuesday: 12:00 – 9:00 PM; Wednesday: 12:00 – 9:00 PM; Thursday: 12:00 – 10:00 PM; Friday: 12:00 – 11:00 PM; Saturday: 11:00 AM – 11:00 PM; Sunday: 11:00 AM – 9:00 PM",
+    "social_media_links": [],
+    "color_palette": null,
+    "model_url": null,
+    "slug": "boba-pub-san-jose",
+    "status": "pending"
+  }
+]

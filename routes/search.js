@@ -105,8 +105,9 @@ async function runPipeline(searchId, query) {
 
   log(`${toProcess.length} businesses to process. Starting enrichment + site generation...`);
 
-  // One Yutori task per place; run all in parallel (each: create -> poll -> append -> generate)
-  const runOne = async (place) => {
+  // --- Phase 1: Run all Yutori enrichments in parallel ---
+  const enriched = [];          // collects { place, business } objects ready for generation
+  const enrichPromises = toProcess.map(async (place) => {
     const slug = slugify(place.name);
     let taskId;
 
@@ -134,7 +135,6 @@ async function runPipeline(searchId, query) {
       socialMediaLinks = Array.isArray(parsed.social_media_links) ? parsed.social_media_links : [];
       colorPalette = parsed.color_palette || null;
       log(`[${place.name}] Research complete${email ? ` — found email: ${email}` : ' — no email found'}`);
-      // Look up 3D model from Poly Haven (always tries to find one)
       log(`[${place.name}] Looking up 3D model${parsed.asset_keyword ? ` for "${parsed.asset_keyword}"` : ''}...`);
       try {
         const model = await polyhaven.findModel(parsed.asset_keyword);
@@ -175,14 +175,19 @@ async function runPipeline(searchId, query) {
       status: 'pending'
     };
 
-    // Append one business to businesses.json (atomic)
     try {
       await appendData('businesses.json', { ...business });
     } catch (err) {
       console.error('Store append error:', err);
     }
 
-    // Call POST /api/generate for this business (generates 2 variants)
+    enriched.push({ place, business, slug });
+  });
+
+  await Promise.all(enrichPromises);
+
+  // --- Phase 2: Generate websites one at a time (Claude rate limits) ---
+  for (const { place, business, slug } of enriched) {
     log(`[${place.name}] Generating websites with AI (3D + Classic)...`);
     let liveUrl3d = null;
     let liveUrlClassic = null;
@@ -192,7 +197,7 @@ async function runPipeline(searchId, query) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          id,
+          id: business.id,
           name: business.name,
           description: business.description,
           style: business.style,
@@ -234,11 +239,6 @@ async function runPipeline(searchId, query) {
       log('All businesses processed.');
       search.status = 'completed';
     }
-  };
-
-  // Process businesses one at a time to stay within API rate limits
-  for (const place of toProcess) {
-    await runOne(place);
   }
 }
 
