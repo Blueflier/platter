@@ -18,5 +18,35 @@
     "email": "hello@earthtonecafe.com",
     "generated_at": "2026-02-28T00:43:46.361Z",
     "status": "active"
+  },
+  {
+    "id": "e9eccb92-b9a7-4f82-b3a6-3b871e522e3b",
+    "name": "Café LaTTea",
+    "slug": "caf-lattea",
+    "live_url_3d": "https://platter-caf-lattea-3d.onrender.com",
+    "live_url_classic": "https://platter-caf-lattea-classic.onrender.com",
+    "email": null,
+    "generated_at": "2026-02-28T02:11:20.696Z",
+    "status": "active"
+  },
+  {
+    "id": "a3b79305-a99c-476d-81a6-8c89ee71a41f",
+    "name": "Café do Canto - Portuguese Café",
+    "slug": "caf-do-canto-portuguese-caf",
+    "live_url_3d": "https://platter-caf-do-canto-portuguese-caf-3d.onrender.com",
+    "live_url_classic": "https://platter-caf-do-canto-portuguese-caf.onrender.com",
+    "email": null,
+    "generated_at": "2026-02-28T02:14:39.578Z",
+    "status": "active"
+  },
+  {
+    "id": "a5ea8e4e-f7c5-4227-8906-2b4a0c83452e",
+    "name": "Cafe Via He",
+    "slug": "cafe-via-he",
+    "live_url_3d": "https://platter-cafe-via-he-3d.onrender.com",
+    "live_url_classic": "https://platter-cafe-via-he-classic.onrender.com",
+    "email": null,
+    "generated_at": "2026-02-28T02:17:29.146Z",
+    "status": "active"
   }
 ]
