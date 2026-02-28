@@ -130,5 +130,86 @@
     "model_url": null,
     "slug": "boba-pub-san-jose",
     "status": "pending"
+  },
+  {
+    "id": "0527badd-a1b9-46c8-8037-72c057b7a5c0",
+    "name": "Metropolitan Coffee",
+    "address": "720 Market St, San Francisco, CA 94102, USA",
+    "phone": "(415) 926-9359",
+    "email": null,
+    "has_website": false,
+    "google_reviews": 134,
+    "google_rating": 4.6,
+    "style": "Warm and inviting with Turkish-inspired elements Espresso cup Turkish baklava pastry Coffee beans Warm lantern or ambient lighting Turkish tile patterns COLOR_PALETTE: theme=light, bg=#F5E6D3, text=#3D2817, accent=#C85A3A, accent2=#2C5F7F 3D_ASSET: coffee_cup",
+    "description": "Metropolitan Coffee — Key Details and Design Takeaways Guests note a spacious, calm interior with ample seating suited to quick coffee stops and longer work sessions. The mood balances lively energy with quiet comfort, and staff are consistently friendly and attentive.",
+    "business_hours": "Monday: 6:00 AM – 6:00 PM; Tuesday: 6:00 AM – 6:00 PM; Wednesday: 6:00 AM – 6:00 PM; Thursday: 6:00 AM – 6:00 PM; Friday: 6:00 AM – 6:00 PM; Saturday: 6:00 AM – 6:00 PM; Sunday: 6:00 AM – 6:00 PM",
+    "social_media_links": [],
+    "color_palette": {
+      "theme": "light",
+      "bg": "#F5E6D3",
+      "text": "#3D2817",
+      "accent": "#C85A3A",
+      "accent2": "#2C5F7F"
+    },
+    "model_url": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/1k/CoffeeCart_01/CoffeeCart_01_1k.gltf",
+    "slug": "metropolitan-coffee",
+    "status": "deployed",
+    "live_url_3d": "https://platter-metropolitan-coffee-3d.onrender.com",
+    "live_url_classic": "https://platter-metropolitan-coffee-classic.onrender.com"
+  },
+  {
+    "id": "1f937fc1-5a8f-413f-b4e3-9b7206dbffc4",
+    "name": "Beluna Cafe",
+    "address": "1195 Oak St, San Francisco, CA 94117, USA",
+    "phone": "(415) 529-1883",
+    "email": null,
+    "has_website": false,
+    "google_reviews": 156,
+    "google_rating": 4.8,
+    "style": "Details and Design",
+    "description": "Beluna Cafe: Key Details and Design Direction Contact Yelp listing. Vibe & Experience Bright, airy, two-level, and family-owned, with abundant natural light and a relaxed, welcoming feel suited for working or socializing.",
+    "business_hours": "Monday: 8:00 AM – 3:00 PM; Tuesday: 8:00 AM – 3:00 PM; Wednesday: 8:00 AM – 3:00 PM; Thursday: 8:00 AM – 3:00 PM; Friday: 8:00 AM – 3:00 PM; Saturday: 8:00 AM – 3:00 PM; Sunday: 8:00 AM – 3:00 PM",
+    "social_media_links": [
+      "https://www.instagram.com/belunacafe/",
+      "https://www.yelp.com/biz/beluna-cafe-san-francisco"
+    ],
+    "color_palette": {
+      "theme": "light",
+      "bg": "#F5F3F0",
+      "text": "#3D3D3D",
+      "accent": "#D97757",
+      "accent2": "#9CAF9C"
+    },
+    "model_url": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/1k/CoffeeCart_01/CoffeeCart_01_1k.gltf",
+    "slug": "beluna-cafe",
+    "status": "pending"
+  },
+  {
+    "id": "9efe4466-8e74-49cf-a3db-9df74ac14c6f",
+    "name": "Earth Tone Cafe",
+    "address": "1097 Irving St, San Francisco, CA 94122, USA",
+    "phone": "(415) 741-8384",
+    "email": "hello@earthtonecafe.com",
+    "has_website": false,
+    "google_reviews": 121,
+    "google_rating": 4.5,
+    "style": "Warm Bohemian Eclectic Representative objects/themes: Coffee cup with pressed flowers Succulent plants Marble café table Thai coffee beans Rustic wood accents COLOR_PALETTE: theme=light, bg=#F5F1E8, text=#3D2817, accent=#9CAF88, accent2=#C85A54 3D_ASSET: coffee_cup",
+    "description": "Cozy Thai-owned café with floral latte art earthtonecafe.com Social: Not publicly listed on Yelp. Hours Monday – Thursday: 8:00 AM – 3:00 PM Friday – Sunday: 8:00 AM – 5:00 PM Vibe & customer experience A tiny, intimate Thai-owned café in the Inner Sunset with a cozy, eclectic bohemian aesthetic.",
+    "business_hours": "Monday: 8:00 AM – 3:00 PM; Tuesday: 8:00 AM – 3:00 PM; Wednesday: 8:00 AM – 3:00 PM; Thursday: 8:00 AM – 3:00 PM; Friday: 8:00 AM – 5:00 PM; Saturday: 8:00 AM – 5:00 PM; Sunday: 8:00 AM – 5:00 PM",
+    "social_media_links": [
+      "https://www.yelp.com/biz/earth-tone-cafe-san-francisco"
+    ],
+    "color_palette": {
+      "theme": "light",
+      "bg": "#F5F1E8",
+      "text": "#3D2817",
+      "accent": "#9CAF88",
+      "accent2": "#C85A54"
+    },
+    "model_url": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/1k/CoffeeCart_01/CoffeeCart_01_1k.gltf",
+    "slug": "earth-tone-cafe",
+    "status": "deployed",
+    "live_url_3d": "https://platter-earth-tone-cafe-3d.onrender.com",
+    "live_url_classic": "https://platter-earth-tone-cafe-classic.onrender.com"
   }
 ]

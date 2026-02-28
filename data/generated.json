@@ -1,1 +1,22 @@
-[]
+[
+  {
+    "id": "0527badd-a1b9-46c8-8037-72c057b7a5c0",
+    "name": "Metropolitan Coffee",
+    "slug": "metropolitan-coffee",
+    "live_url_3d": "https://platter-metropolitan-coffee-3d.onrender.com",
+    "live_url_classic": "https://platter-metropolitan-coffee-classic.onrender.com",
+    "email": null,
+    "generated_at": "2026-02-28T00:36:48.434Z",
+    "status": "active"
+  },
+  {
+    "id": "9efe4466-8e74-49cf-a3db-9df74ac14c6f",
+    "name": "Earth Tone Cafe",
+    "slug": "earth-tone-cafe",
+    "live_url_3d": "https://platter-earth-tone-cafe-3d.onrender.com",
+    "live_url_classic": "https://platter-earth-tone-cafe-classic.onrender.com",
+    "email": "hello@earthtonecafe.com",
+    "generated_at": "2026-02-28T00:43:46.361Z",
+    "status": "active"
+  }
+]
